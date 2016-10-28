@@ -1,0 +1,23 @@
+body { padding-top: 60px; }
+.dropdown-login{
+    min-width: 250px;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+    min-height: 300px;
+
+    margin: 0 auto;
+}
+
+.full-width {
+    width: 100%;
+
+    margin: 0 auto;
+}
+
+.full-height {
+
+    height: 100%;
+}

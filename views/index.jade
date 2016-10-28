@@ -1,5 +1,24 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  div.container
+    div.row
+      div.col-md-12
+        h1= title
+      div.col-md-6
+        div.full-height.full-width
+          div#map
+      div.col-md-6
+        form(action="",method=post)
+          div.panel-group
+            div.panel.panel-primary.add-after-panel
+              div.panel-heading
+                h2#startingtitle Startinf point
+              div.panel-body
+                p#startingdescription
+            div.panel.panel-primary
+              div.panel-heading
+                h2#endingtitle ending point
+              div.panel-body
+                p#endingdescription
+      div.col-md-12

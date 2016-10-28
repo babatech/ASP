@@ -1,7 +1,23 @@
 doctype html
 html
-  head
-    title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
-  body
-    block content
+    head
+        block head
+            block title
+                title #{header.title}
+            block meta
+                meta(name='description', content='')
+                meta(name='keywords', content='')
+            link(href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/superhero/bootstrap.min.css", rel="stylesheet", integrity="sha384-Xqcy5ttufkC3rBa8EdiAyA1VgOGrmel2Y+wxm4K3kI3fcjTWlDWrlnxyD6hOi3PF", crossorigin="anonymous")
+            link(rel='stylesheet', href='/css/style.css')
+
+            script(src='//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js')
+            script(src='http://connect.facebook.net/en_US/all.js')
+            script(src='/socket.io/socket.io.js')
+            script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyCPRT3eQNIcTUgj5mSHT5AA6qJ_NG3MCj4&libraries=places')
+            script(src='/scripts/globle.js')
+    body
+        include header
+
+        block content
+
+        include footer
