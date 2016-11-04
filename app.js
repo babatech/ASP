@@ -20,7 +20,6 @@ var app = express();
 var io = socket_io();
 app.io = io;
 
-
 // view engine setup
 
 app.set('views', path.join(__dirname, 'views'));
