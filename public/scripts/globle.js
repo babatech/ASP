@@ -14,9 +14,9 @@ $('.btn-login-facebook').bind('click', function() {
 });
 
 /*
-$('#logout').bind('click', function() {
-    FB.logout(handleSessionResponse);
-});*/
+ $('#logout').bind('click', function() {
+ FB.logout(handleSessionResponse);
+ });*/
 
 // handle a session response from any of the auth related calls
 function handleSessionResponse() {
@@ -29,15 +29,28 @@ function handleSessionResponse() {
 
 
 var socket = io();
+var userinfo =[];
 var map;
 var pos;
 var placeService;
+var geocoder;
+
 function initMap() {
-    map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 2,
-        center: {lat: 0, lng: 0}
-    });
-    placeService = new google.maps.places.PlacesService(map);
+    if(map.undefined){
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 2,
+            center: {lat: 0, lng: 0}
+        });
+    }
+    if(geocoder.undefined){
+        geocoder = new google.maps.Geocoder;
+    }
+    if(placeService.undefined){
+        placeService = new google.maps.places.PlacesService(map);
+    }
+}
+function getbrowserGeolocation() {
+    initMap()
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             pos = {
@@ -45,10 +58,7 @@ function initMap() {
                 lng: position.coords.longitude
             };
 
-            map.setCenter(pos);
-            map.setZoom(12);
-            //searchNearbyAttarctions(pos);
-            socket.emit('user-position', pos);
+            setUserPosition(pos)
         }, function() {
             handleLocationError(true, infoWindow, map.getCenter());
         });
@@ -56,12 +66,72 @@ function initMap() {
         handleLocationError(false, infoWindow, map.getCenter());
     }
 }
+function  setUserPosition(position) {
+    var latLng = new google.maps.LatLng(position.lat, position.lng);
+    // Creating a marker and putting it on the map
+    var marker = new google.maps.Marker({
+        position: latLng,
+        map: map,
+        title: "Your location",
+        icon: "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"
+    });
+    userinfo["userLocation"]=position;
+    geocodeLatLng(position);
+    map.setCenter(position);
+    map.setZoom(12);
+    addMarker(marker,"Your location");
+    //searchNearbyAttarctions(pos);
+    socket.emit('user-position', pos);
+}
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
     infoWindow.setPosition(pos);
     infoWindow.setContent(browserHasGeolocation ?
         'Error: The Geolocation service failed.' :
         'Error: Your browser doesn\'t support geolocation.');
+}
+function addMarker(marker,contentString) {
+    if(contentString.undefined){
+        alert("contentString undefined");
+    }
+    if(marker.undefined){
+        alert("marker undefined");
+    }
+    var infowindow = new google.maps.InfoWindow({
+        content: contentString
+    });
+    marker.addListener('click', function() {
+        infowindow.open(map, marker);
+    });
+}
+function setStartLocation(position,name,placeobj) {
+    userinfo["startLocation"]=[];
+    userinfo["startLocation"]["coord"]=position;
+    userinfo["startLocation"]["name"]=name;
+    userinfo["startLocation"]["placeobj"]=placeobj;
+    $("#startingdescription").text(name);
+
+}
+function setEndLocation(position,name,placeobj) {
+    userinfo["endLocation"]=[];
+    userinfo["endLocation"]["coord"]=position;
+    userinfo["endLocation"]["name"]=name;
+    userinfo["endLocation"]["placeobj"]=placeobj;
+    $("#endingdescription").text(name);
+
+}
+function geocodeLatLng(position) {
+    geocoder.geocode({'location': position}, function(results, status) {
+        if (status === 'OK') {
+            if (results[1]) {
+                setStartLocation(position,results[1].formatted_address,results[1])
+            } else {
+                window.alert('No results found');
+            }
+        } else {
+            window.alert('Geocoder failed due to: ' + status);
+        }
+    });
 }
 
 $(document).ready(function(){
@@ -72,25 +142,49 @@ $(document).ready(function(){
 
         event.preventDefault();
     });
+    $( ".toggle-map-plan-panel" ).click(function() {
+        $( ".map-plan-panel" ). toggleClass( "hidden" );
+        $( ".map-city-panel" ). toggleClass( "hidden" );
+    });
+    $( ".get-current-location" ).click(function() {
+        getbrowserGeolocation();
+    });
+    /*
+    @todo:waqar
+    this the function for submiting user input for email and user location
+    and see app.js file for server side function for handling the user submission
+     */
+    $("#shareLocationForm").submit(function(event) {
+        if($(".shareLocationEmail").val()!=null ){
+            getbrowserGeolocation();
+            var shareLocation = {
+                pos: pos,
+                email: $(".shareLocationEmail").val()
+            };
+            socket.emit('user-share-location', shareLocation);
+        }
 
+
+        event.preventDefault();
+    });
 });
 
- socket.on('nearbyplaces', function(data){
+socket.on('nearbyplaces', function(data){
 
-     for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < data.length; i++) {
 
-     var place = data[i];
-     var latLng = new google.maps.LatLng(place.lat, place.lng);
-     // Creating a marker and putting it on the map
-     var marker = new google.maps.Marker({
-         position: latLng,
-         map: map,
-         title: place.title,
-         icon: place.icon
+        var place = data[i];
+        var latLng = new google.maps.LatLng(place.lat, place.lng);
+        // Creating a marker and putting it on the map
+        var marker = new google.maps.Marker({
+            position: latLng,
+            map: map,
+            title: place.title,
+            icon: place.icon
         });
-     }
+    }
 
- });
+});
 socket.on('data', function(data){
     var infoWindow = new google.maps.InfoWindow({map: map});
     var position = data.pos;
@@ -154,7 +248,7 @@ function createMarker(place) {
     var marker = new google.maps.Marker({
         map: map,
         position: place.geometry.location/*,
-        icon:place.icon*/
+         icon:place.icon*/
     });
 
     google.maps.event.addListener(marker, 'click', function() {
@@ -197,3 +291,8 @@ function makePanel(place) {
 function addPanel(newpanel) {
     $(newpanel).insertAfter(".add-after-panel");
 }
+
+/*
+@todo: all, areeb,waqar,shoaib,daniyal,shahab,mir
+add your frontend javascript here
+ */
