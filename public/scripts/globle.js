@@ -34,23 +34,50 @@ var map;
 var pos;
 var placeService;
 var geocoder;
+var autocomplete;
 
 function initMap() {
-    if(map.undefined){
-        map = new google.maps.Map(document.getElementById('map'), {
+    var mapelemtn =document.getElementById('map');
+    if (typeof mapelemtn !== 'undefined'){
+        alert();
+    }
+    if(typeof map === 'undefined' && typeof mapelemtn !== 'undefined' ){
+
+        map = new google.maps.Map(mapelemtn, {
             zoom: 2,
             center: {lat: 0, lng: 0}
         });
     }
-    if(geocoder.undefined){
+    if(typeof geocoder === 'undefined'){
         geocoder = new google.maps.Geocoder;
     }
-    if(placeService.undefined){
+    if(typeof placeService === 'undefined'){
         placeService = new google.maps.places.PlacesService(map);
+    }
+    if(typeof autocomplete === 'undefined'){
+
+        autocomplete = new google.maps.places.Autocomplete(document.getElementById('searchcity'), { types: [ 'geocode' ] });
+        google.maps.event.addListener(autocomplete, 'place_changed', function() {
+
+            var place = autocomplete.getPlace();
+            console.log(place);
+
+            var lat = place.geometry.location.lat(),
+                lng = place.geometry.location.lng();
+            pos = {
+                lat: lat,
+                lng: lng
+            };
+// Then do whatever you want with them
+            toggleMapPlanPanle();
+            setUserPosition(pos);
+            console.log(lat);
+            console.log(lng);
+        });
     }
 }
 function getbrowserGeolocation() {
-    initMap()
+
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             pos = {
@@ -67,6 +94,7 @@ function getbrowserGeolocation() {
     }
 }
 function  setUserPosition(position) {
+    initMap();
     var latLng = new google.maps.LatLng(position.lat, position.lng);
     // Creating a marker and putting it on the map
     var marker = new google.maps.Marker({
@@ -133,6 +161,16 @@ function geocodeLatLng(position) {
         }
     });
 }
+function toggleMapPlanPanle() {
+    if(typeof pos !== 'undefined'){
+        $( ".map-plan-panel" ). toggleClass( "hidden" );
+        $( ".map-city-panel" ). toggleClass( "hidden" );
+        alert("not empty");
+    }else{
+        alert("empty");
+    }
+
+}
 
 $(document).ready(function(){
     initMap();
@@ -143,8 +181,7 @@ $(document).ready(function(){
         event.preventDefault();
     });
     $( ".toggle-map-plan-panel" ).click(function() {
-        $( ".map-plan-panel" ). toggleClass( "hidden" );
-        $( ".map-city-panel" ). toggleClass( "hidden" );
+        toggleMapPlanPanle()
     });
     $( ".get-current-location" ).click(function() {
         getbrowserGeolocation();
