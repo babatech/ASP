@@ -88,7 +88,7 @@ io.on('connection', function(socket){
     // sanitaze html
     data.lat = sanitizer.escape(data.lat);
     data.lng = sanitizer.escape(data.lng);
-    getnearbyPlaces(data);
+    //getnearbyPlaces(data);
     //io.emit('nearbyplaces', outputarr);
     console.log(outputarr);
     console.log('location:' + data.lat +":"+ data.lng);
@@ -97,7 +97,22 @@ io.on('connection', function(socket){
   socket.on('disconnect', function(){
     console.log('user disconnected');
   });
+  /*
+   @todo waqar
+   this the function where share location form submission is handled
+   */
+  socket.on('user-share-location', function(data){
+
+    // sanitaze html
+    data.pos.lat = sanitizer.escape(data.pos.lat);
+    data.pos.lng = sanitizer.escape(data.pos.lng);
+
+
+    io.emit('data', data);
+
+  });
 });
+
 // Geocode an address.
 /*googleMapsClient.geocode({
  address: '1600 Amphitheatre Parkway, Mountain View, CA'
