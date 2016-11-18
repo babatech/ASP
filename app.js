@@ -121,6 +121,19 @@ io.on('connection', function(socket){
     io.emit('data', data);
 
   });
+  /*
+  areeb sokcet
+   */
+    socket.on('usrname', function (data) {
+        socket.emit('usr', data);
+    });
+    socket.on('chatmessage', function (data) {
+        socket.emit('msg', data);
+        //socket.emit('data', data);
+        console.log(data)});
+  /*
+  areeb sokcet
+   */
 });
 
 // Geocode an address.
