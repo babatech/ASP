@@ -238,7 +238,17 @@ $(document).ready(function(){
         event.preventDefault();
     });
 
-
+/*
+areeb ready function area start
+ */
+    $('.chatInCityForm').submit(function(){
+        socket.emit('chatmessage', $('#m').val());
+        $('#m').val('');
+        return false;
+    });
+/*
+areeb ready function area end
+ */
 
     window.setInterval(function(){
         /// call your function here
@@ -374,4 +384,28 @@ function addPanel(newpanel) {
 /*
 @todo: all, areeb,waqar,shoaib,daniyal,shahab,mir
 add your frontend javascript here
+ */
+
+/*
+areeb js function area start
+ */
+socket.on('connect', function () {
+    socket.emit('usrname', prompt("What is your name ? "));
+});
+
+socket.on('usr', function (data) {
+    socket.username = data;
+});
+
+socket.on('msg' ,function (data) {
+    //$('#messages').append(socket.username, " : "+data+"<br/>");
+    $('#startingdescription').append(socket.username, " : "+data+"<br/>");
+    var infoWindow = new google.maps.InfoWindow({map: map});
+    infoWindow.setPosition(pos);
+    infoWindow.setContent(data);
+    setTimeout(function(){infoWindow.close();}, '5000');
+});
+
+/*
+areeb js function area end
  */
