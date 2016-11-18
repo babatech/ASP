@@ -44,9 +44,9 @@ function initMap() {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
             };
-
             map.setCenter(pos);
             map.setZoom(12);
+
             //searchNearbyAttarctions(pos);
             socket.emit('user-position', pos);
         }, function() {
@@ -73,7 +73,30 @@ $(document).ready(function(){
         event.preventDefault();
     });
 
+    $('#form').submit(function(){
+        socket.emit('chatmessage', $('#m').val());
+        $('#m').val('');
+        return false;
+    });
+
 });
+socket.on('connect', function () {
+    socket.emit('usrname', prompt("What is your name ? "));
+});
+
+socket.on('usr', function (data) {
+    socket.username = data;
+});
+
+socket.on('msg' ,function (data) {
+    //$('#messages').append(socket.username, " : "+data+"<br/>");
+    $('#startingdescription').append(socket.username, " : "+data+"<br/>");
+    var infoWindow = new google.maps.InfoWindow({map: map});
+    infoWindow.setPosition(pos);
+    infoWindow.setContent(data);
+    setTimeout(function(){infoWindow.close();}, '5000');
+});
+
 
  socket.on('nearbyplaces', function(data){
 
@@ -95,7 +118,6 @@ socket.on('data', function(data){
     var infoWindow = new google.maps.InfoWindow({map: map});
     var position = data.pos;
     var message = data.message;
-
     message = message.replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, "<a target='_blank' href='$1'>$1</a>");
 
     infoWindow.setPosition(position);
@@ -105,6 +127,9 @@ socket.on('data', function(data){
         infoWindow.close();
     }, 5000);
 });
+
+
+
 function searchNearbyAttarctions(position) {
     var latLng = new google.maps.LatLng(position.lat, position.lng);
     placeService.nearbySearch({
@@ -183,6 +208,7 @@ function makePanel(place) {
     newpanelbodycoldes.className="col-sm-6";
     newpanelbodycoldes.innerHTML='<p><strong>'+place.name+'</strong></br>'+place.name+'</p>';
 
+
     newpanelbodyrow.appendChild(newpanelbodycolimage);
     newpanelbodyrow.appendChild(newpanelbodycoldes);
 
@@ -193,6 +219,8 @@ function makePanel(place) {
     addPanel(newpanel);
 
 }
+
+
 
 function addPanel(newpanel) {
     $(newpanel).insertAfter(".add-after-panel");

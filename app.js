@@ -69,8 +69,9 @@ app.use(function(err, req, res, next) {
 });
 
 io.on('connection', function(socket){
-  console.log('new user connected');
 
+
+  console.log('new user connected');
   socket.on('data', function(data){
     // limit chars
     data.message = data.message.substring(0,200);
@@ -91,10 +92,21 @@ io.on('connection', function(socket){
     console.log(outputarr);
     console.log('location:' + data.lat +":"+ data.lng);
   });
+  socket.on('chatmessage', function (data) {
+    socket.emit('msg', data);
+    //socket.emit('data', data);
+    console.log(data)});
 
   socket.on('disconnect', function(){
     console.log('user disconnected');
   });
+
+  socket.on('usrname', function (data) {
+      socket.emit('usr', data);
+  })
+
+
+
 });
 // Geocode an address.
 /*googleMapsClient.geocode({
@@ -142,5 +154,9 @@ function processnearbyplace(result){
 
   }
 }
+
+
+
+
 
 module.exports = app;
