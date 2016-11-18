@@ -13,7 +13,7 @@ $('.btn-login-facebook').bind('click', function() {
     FB.login(handleSessionResponse);
 });
 
-/* bind click to logout button daniyal syed Ali
+/* bind click to logout button daniyal syed Ali testing
  $('#logout').bind('click', function() {
  FB.logout(handleSessionResponse);
  });*/
