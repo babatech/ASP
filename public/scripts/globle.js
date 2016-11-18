@@ -93,6 +93,23 @@ function getbrowserGeolocation() {
         handleLocationError(false, infoWindow, map.getCenter());
     }
 }
+function RefershUSERGeolocation() {
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            pos = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            };
+
+            //setUserPosition(pos)
+        }, function() {
+            handleLocationError(true, infoWindow, map.getCenter());
+        });
+    } else {
+        handleLocationError(false, infoWindow, map.getCenter());
+    }
+}
 function  setUserPosition(position) {
     initMap();
     var latLng = new google.maps.LatLng(position.lat, position.lng);
@@ -204,6 +221,15 @@ $(document).ready(function(){
 
         event.preventDefault();
     });
+
+
+
+    window.setInterval(function(){
+        /// call your function here
+        RefershUSERGeolocation();
+    }, 2000);
+
+
 });
 
 socket.on('nearbyplaces', function(data){
