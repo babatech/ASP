@@ -93,6 +93,17 @@ io.on('connection', function(socket){
     console.log('location:' + data.lat +":"+ data.lng);
   });
 
+  socket.on('login-user-request', function(data){
+    /*
+     @Todo: daniyal
+     yah app ka starting point hai yaha app ko login k data malay ga
+     */
+
+
+    console.log(data);
+
+  });
+
   socket.on('disconnect', function(){
     console.log('user disconnected');
   });

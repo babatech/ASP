@@ -15,12 +15,12 @@ user['loginStatus'] = true;
 /* GET home page. */
 router.get('/', function(req, res, next) {
     header["title"] = 'Home';
-    res.render('index', { header: header,user: user,title: 'khlo tari' });
+    res.render('index', { header: header,user: user,title: 'Local guide' });
 });
 /* GET about page. */
 router.get('/about', function(req, res, next) {
     header["title"] = 'About Us';
-    res.render('about', { header: header });
+    res.render('about', { header: header,user: user,title: 'About us'  });
 });
 /*
 @todo: areeb
@@ -30,7 +30,7 @@ this is your page for chat and url is  http://localhost:3000/chat
 
 router.get('/chat', function(req, res, next) {
     header["title"] = 'Chat with people around you';
-    res.render('chat', { header: header });
+    res.render('chat', {header: header,user: user,title: 'Chat arround you'  });
 });
 
 /*
@@ -43,7 +43,7 @@ whom he/she can share his/her location
  */
 router.get('/sharelocation', function(req, res, next) {
     header["title"] = 'Share location with your buddy';
-    res.render('sharelocation', { header: header });
+    res.render('sharelocation', { header: header,user: user,title: 'Sh'  });
 });
 
 module.exports = router;
