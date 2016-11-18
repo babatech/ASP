@@ -39,7 +39,7 @@ var autocomplete;
 function initMap() {
     var mapelemtn =document.getElementById('map');
     if (typeof mapelemtn !== 'undefined'){
-        alert();
+        //alert();
     }
     if(typeof map === 'undefined' && typeof mapelemtn !== 'undefined' ){
 
@@ -182,9 +182,9 @@ function toggleMapPlanPanle() {
     if(typeof pos !== 'undefined'){
         $( ".map-plan-panel" ). toggleClass( "hidden" );
         $( ".map-city-panel" ). toggleClass( "hidden" );
-        alert("not empty");
+        //alert("not empty");
     }else{
-        alert("empty");
+        //alert("empty");
     }
 
 }
@@ -209,6 +209,7 @@ $(document).ready(function(){
     and see app.js file for server side function for handling the user submission
      */
     $("#shareLocationForm").submit(function(event) {
+        return false;
         if($(".shareLocationEmail").val()!=null ){
             getbrowserGeolocation();
             var shareLocation = {

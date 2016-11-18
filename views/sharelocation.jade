@@ -4,12 +4,12 @@ block content
   div.container
     div.row.share-location-buddy
       div.col-md-12
-        form#searchCityForm(name="shareLocationForm",action="",method=post)
+        form#shareLocationForm(name="shareLocationForm",action="",method="POST")
           div.form-group
             div.col-sm-4
               label.control-label(for="shareLocationEmail") Enter email of person you want to share your location with
             div.col-sm-4
-              input(type="text",name="shareLocationEmail").form-control.shareLocationEmail
+              input(type="email",name="shareLocationEmail").form-control.shareLocationEmail#shareLocationEmail
             div.col-sm-2
               input.btn.btn-success.toggle-map-share-panel(type="submit",value="Submit")
 
