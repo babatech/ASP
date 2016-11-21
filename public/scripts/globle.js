@@ -250,10 +250,10 @@ areeb ready function area start
 areeb ready function area end
  */
 
-    window.setInterval(function(){
+    /*window.setInterval(function(){
         /// call your function here
         RefershUSERGeolocation();
-    }, 2000);
+    }, 2000);*/
 
 
 });

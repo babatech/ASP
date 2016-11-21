@@ -6,8 +6,8 @@ header["sitetitle"] = "City Guide";
 user = [];
 user['name'] = "John Snow";
 user['avatar'] = "image link";
-user['status'] = true;
-user['loginStatus'] = true;
+user['status'] = false;
+user['loginStatus'] = false;
 
 
 
@@ -21,6 +21,40 @@ router.get('/', function(req, res, next) {
 router.get('/about', function(req, res, next) {
     header["title"] = 'About Us';
     res.render('about', { header: header,user: user,title: 'About us'  });
+});
+
+/* GET about page. */
+router.get('/about', function(req, res, next) {
+    header["title"] = 'About Us';
+    res.render('about', { header: header,user: user,title: 'About us'  });
+});
+/*
+@Todo: Shoaib
+ */
+
+/*
+ GET login page.
+ */
+router.get('/login', function(req, res, next) {
+    header["title"] = 'Login';
+    res.render('about', { header: header,user: user,title: 'About us'  });
+});
+// process the login form
+router.post('/login', passport.authenticate('local-login', {
+    successRedirect : '/profile', // redirect to the secure profile section
+    failureRedirect : '/login', // redirect back to the signup page if there is an error
+    failureFlash : true // allow flash messages
+}));
+/*
+ GET login with facebook request.
+ */
+router.get('/loginfacebook', function(req, res, next) {
+    header["title"] = 'Login with facebook';
+    res.render('about', { header: header,user: user,title: 'Login with Facebook'  });
+});
+router.get('/logout', function(req, res) {
+    req.logout();
+    res.redirect('/');
 });
 /*
 @todo: areeb

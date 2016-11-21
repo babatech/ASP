@@ -24,7 +24,7 @@ div.navbar.navbar-inverse.navbar-fixed-top(role='navigation')
                                 h4 Login
                             div.dropdown-body
                                 div.col-md-12
-                                    form(name="userLoginForm",action="#",method="POST")#userLoginForm.userLoginForm
+                                    form(name="userLoginForm",action="./login",method="POST")#userLoginForm.userLoginForm
                                         div.form-group
                                             label Username
                                             input(type="text",name="username").form-control
@@ -37,8 +37,8 @@ div.navbar.navbar-inverse.navbar-fixed-top(role='navigation')
                                                 input(type="checkbox",name="rememberme")
                                         button.btn.btn-primary.btn-block(type="submit") login
                                         hr
-                                        a.btn.btn-block.btn-login-facebook(href="#") Login with
-                                        f
+                                        a.btn.btn-block.btn-login-facebook(href="./loginfacebook") Login with Facebook
+
                 else
 
                     li.userdetail

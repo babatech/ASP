@@ -1,4 +1,5 @@
 var express = require('express');
+var session = require('express-session');
 var socket_io = require('socket.io');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -9,8 +10,11 @@ var sanitizer = require('sanitizer');
 var googleMapsClient = require('@google/maps').createClient({
   key: 'AIzaSyCPRT3eQNIcTUgj5mSHT5AA6qJ_NG3MCj4'
 });
+var passport = require('passport');
+var flash = require('connect-flash');
 outputarr = [];
 
+require('./config/passport')(passport); // pass passport for configuration
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
@@ -68,7 +72,15 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-
+// required for passport
+app.use(session({
+  secret: 'shoaibishappyinkiel',
+  resave: true,
+  saveUninitialized: true
+} )); // session secret
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+app.use(flash()); // use connect-flash for flash messages stored in session
 io.on('connection', function(socket){
   console.log('new user connected');
 
