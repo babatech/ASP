@@ -5,7 +5,7 @@ var LocalStrategy   = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
 
 // load up the user model
-var User       		= require('../app/models/user');
+//var User       		= require('../app/models/user');
 
 // load the auth variables
 var configAuth = require('./auth');
@@ -26,9 +26,9 @@ module.exports = function(passport) {
 
     // used to deserialize the user
     passport.deserializeUser(function(id, done) {
-        User.findById(id, function(err, user) {
+        /*User.findById(id, function(err, user) {
             done(err, user);
-        });
+        });*/
     });
 
     // =========================================================================
@@ -83,9 +83,12 @@ module.exports = function(passport) {
 
             // asynchronous
             process.nextTick(function() {
-
+                console.log("token "+token);
+                console.log("refreshToken "+ refreshToken);
+                console.log("profile "+ profile);
+                console.log("done "+ done);
                 // find the user in the database based on their facebook id
-                User.findOne({ 'facebook.id' : profile.id }, function(err, user) {
+                /*User.findOne({ 'facebook.id' : profile.id }, function(err, user) {
 
                     // if there is an error, stop everything and return that
                     // ie an error connecting to the database
@@ -115,7 +118,7 @@ module.exports = function(passport) {
                         });
                     }
 
-                });
+                });*/
             });
 
         }));
