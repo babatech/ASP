@@ -36,6 +36,16 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+// required for passport
+app.use(session({
+    secret: 'shoaibishappyinkiel',
+    resave: true,
+    saveUninitialized: true
+} )); // session secret
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+app.use(flash()); // use connect-flash for flash messages stored in session
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
@@ -72,15 +82,7 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-// required for passport
-app.use(session({
-  secret: 'shoaibishappyinkiel',
-  resave: true,
-  saveUninitialized: true
-} )); // session secret
-app.use(passport.initialize());
-app.use(passport.session()); // persistent login sessions
-app.use(flash()); // use connect-flash for flash messages stored in session
+
 io.on('connection', function(socket){
   console.log('new user connected');
 

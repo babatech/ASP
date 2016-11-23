@@ -1,5 +1,5 @@
 /**
- * Created by Shoaib on 01/21/2016.
+ * Created by Shoaib on 11/12/2016.
  */
 // config/auth.js
 module.exports = {
