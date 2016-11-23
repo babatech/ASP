@@ -194,5 +194,7 @@ function processnearbyplace(result){
 
   }
 }
+function setUserDataInSession(data) {
 
+}
 module.exports = app;
