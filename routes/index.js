@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 
+
 require('../config/passport')(passport); // pass passport for configuration
 var config =require('../config/config');
 header = [];
@@ -30,6 +31,7 @@ router.get('/', function(req, res, next) {
 /* GET about page. */
 router.get('/about', function(req, res, next) {
     header["title"] = 'About Us';
+
     //console.log(req.session);
     res.render('about', { header: header,user: user,title: 'About us'  });
 });
@@ -68,7 +70,7 @@ router.post('/signup', passport.authenticate('local-signup', {
 // process the login form
 router.post('/login', passport.authenticate('local-login', {
     successRedirect : '/', // redirect to the secure profile section
-    failureRedirect : '/login', // redirect back to the signup page if there is an error
+    failureRedirect : '/', // redirect back to the signup page if there is an error
     failureFlash : true // allow flash messages
 }));
 /*

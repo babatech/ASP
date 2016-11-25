@@ -4,6 +4,7 @@
 var LocalStrategy   = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
 var TwitterStrategy = require('passport-twitter').Strategy;
+var usermodule = require('../models/user');
 
 // load up the user model
 var User       		= require('../models/user');
@@ -43,16 +44,24 @@ module.exports = function(passport) {
             passReqToCallback : true // allows us to pass back the entire request to the callback
         },
         function(req, email, password, done) { // callback with email and password from our form
+console.log('here passport');
+            var user={};
 
+            var result = usermodule.login(email,password);
+            if(result == null )
+            {
+                console.log('null data');
+            }else{
+                console.log('usercraeted');
+                user["email"]=email;
+                user["status"]=true;
+                user["name"]="John Snow";
+                user["avatar"]="";
+                user["loginStatus"]=true;
+            }
             /*
             database check here
              */
-            var user={};
-            user["email"]=email;
-            user["status"]=true;
-            user["name"]="John Snow";
-            user["avatar"]="";
-            user["loginStatus"]=true;
             return done(null, user);
 
         }));
@@ -77,15 +86,25 @@ module.exports = function(passport) {
             // User.findOne wont fire unless data is sent back
             process.nextTick(function() {
 
+                var result = usermodule.createuser(email,password);
+
+                var user={};
+                if(result == true )
+                {
+                    console.log('usercraeted');
+                    user["email"]=email;
+                    user["status"]=true;
+                    user["name"]="John Snow";
+                    user["avatar"]="";
+                    user["loginStatus"]=true;
+
+                }else{
+
+                    console.log('error ');
+                }
                 /*
                  database check here
                  */
-                var user={};
-                user["email"]=email;
-                user["status"]=true;
-                user["name"]="John Snow";
-                user["avatar"]="";
-                user["loginStatus"]=true;
                 return done(null, user);
 
             });
@@ -109,6 +128,7 @@ module.exports = function(passport) {
 
             // asynchronous
             process.nextTick(function() {
+
                 // database code here
                 /*User.findOne({ 'facebook.id' : profile.id }, function(err, user) {
 
@@ -142,6 +162,11 @@ module.exports = function(passport) {
 
                 });*/
                 var user={};
+
+
+                var result = usermodule.login(profile.emails[0].value,profile.id);
+
+
                 user["id"]=profile.id;
                 user["token"]=token;
                 user["email"]=profile.emails[0].value;
