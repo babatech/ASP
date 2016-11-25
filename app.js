@@ -127,12 +127,21 @@ io.on('connection', function(socket){
    */
   socket.on('user-share-location', function(data){
 
-    // sanitaze html
-    data.pos.lat = sanitizer.escape(data.pos.lat);
-    data.pos.lng = sanitizer.escape(data.pos.lng);
+    // search for spacific user in active user list on site
+    // if user exit then this emait
+
+    io.emit('get-user-location-request', data);
+    // else send back user a massge that user not exist
+
+    io.emit('share-user-not-online', data);
+
+  });
+  socket.on('update-user-position', function(data){
 
 
-    io.emit('data', data);
+
+
+    io.emit('receive-share-user-position', data);
 
   });
   /*

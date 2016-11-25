@@ -35,6 +35,7 @@ var pos;
 var placeService;
 var geocoder;
 var autocomplete;
+var positionTimer,usermarker,shareusermarker;
 
 function initMap() {
     var mapelemtn =document.getElementById('map');
@@ -114,7 +115,7 @@ function  setUserPosition(position) {
     initMap();
     var latLng = new google.maps.LatLng(position.lat, position.lng);
     // Creating a marker and putting it on the map
-    var marker = new google.maps.Marker({
+    usermarker = new google.maps.Marker({
         position: latLng,
         map: map,
         title: "Your location",
@@ -124,7 +125,7 @@ function  setUserPosition(position) {
     geocodeLatLng(position);
     map.setCenter(position);
     map.setZoom(12);
-    addMarker(marker,"Your location");
+    addMarker(usermarker,"Your location");
     //searchNearbyAttarctions(pos);
     socket.emit('user-position', pos);
 }
@@ -210,19 +211,48 @@ $(document).ready(function(){
     and see app.js file for server side function for handling the user submission
      */
     $("#shareLocationForm").submit(function(event) {
-        return false;
+        //return false;
         if($(".shareLocationEmail").val()!=null ){
-            getbrowserGeolocation();
+
+            watchCurrentPosition();
+
             var shareLocation = {
                 pos: pos,
                 email: $(".shareLocationEmail").val()
             };
             socket.emit('user-share-location', shareLocation);
+            //$( ".map-share-panel" ). toggleClass( "hidden" );
+            $( ".share-location-buddy" ). toggleClass( "hidden" );
         }
 
 
         event.preventDefault();
     });
+    function watchCurrentPosition() {
+        positionTimer = navigator.geolocation.watchPosition(function(position) {
+            pos = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            };
+            if (typeof usermarker === 'undefined'){
+                usermarker = new google.maps.Marker({
+                    position: new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
+                    map: map,
+                    title: "Your location",
+                    icon: "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"
+                });
+                addMarker(usermarker,"your location");
+                setUserPosition(pos);
+                console.log("check watch");
+            }
+
+
+            setMarkerPosition(usermarker, position);
+            socket.emit('update-user-position', position);
+        });
+    }
+
+
 
 /*
 areeb ready function area start
@@ -368,7 +398,7 @@ function addPanel(newpanel) {
 }
 
 /*
-@todo: all, areeb,waqar,shoaib,daniyal,shahab,mir
+@todo: all
 add your frontend javascript here
  */
 
@@ -395,3 +425,27 @@ socket.on('msg' ,function (data) {
 /*
 areeb js function area end
  */
+function setMarkerPosition(marker, position) {
+    marker.setPosition(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+    console.log(position);
+}
+socket.on('share-user-request-accepted', function(data){
+    usermarker = new google.maps.Marker({
+        position: new google.maps.LatLng(data.coords.latitude, data.coords.longitude),
+        map: map,
+        title: "other user location"
+    });
+    addMarker(shareusermarker,"other user location");
+});
+socket.on('receive-share-user-position', function(data){
+    setMarkerPosition(shareusermarker, data);
+});
+
+socket.on('get-user-location-request', function(data){
+    // code for user share location request
+    // if user accept request then redirect it to user http://localhost:300/sharelocation
+    // else send server that user didnot want to share location with requested user
+});
+socket.on('share-user-not-online', function(data){
+    alert("user not active on site");
+});
