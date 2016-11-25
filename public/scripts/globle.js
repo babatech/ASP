@@ -37,6 +37,7 @@ var geocoder;
 var autocomplete;
 var positionTimer,usermarker,shareusermarker;
 
+
 function initMap() {
     var mapelemtn =document.getElementById('map');
     if (typeof mapelemtn !== 'undefined'){
@@ -262,6 +263,13 @@ areeb ready function area start
         $('#m').val('');
         return false;
     });
+    $( ".startchatbtn" ).click(function() {
+        socket.emit('usrname', prompt("What is your name ? "));
+        $( ".formUserChat" ). toggleClass( "hidden" );
+        $( ".startchatpanel" ). toggleClass( "hidden" );
+
+    });
+
 /*
 areeb ready function area end
  */
@@ -406,16 +414,17 @@ add your frontend javascript here
 areeb js function area start
  */
 socket.on('connect', function () {
-    socket.emit('usrname', prompt("What is your name ? "));
+   // socket.emit('usrname', prompt("What is your name ? "));
+
 });
 
 socket.on('usr', function (data) {
     socket.username = data;
 });
 
-socket.on('msg' ,function (data) {
+socket.on('msg' ,function (usr, data) {
     //$('#messages').append(socket.username, " : "+data+"<br/>");
-    $('#startingdescription').append(socket.username, " : "+data+"<br/>");
+    $('#startingdescription').append(usr, " : "+data+"<br/>");
     var infoWindow = new google.maps.InfoWindow({map: map});
     infoWindow.setPosition(pos);
     infoWindow.setContent(data);

@@ -24,6 +24,9 @@ var app = express();
 var io = socket_io();
 app.io = io;
 
+var usernames={};
+var rooms = ['Kiel, Germany', 'Hamburg, Germany'];
+
 // view engine setup
 
 app.set('views', path.join(__dirname, 'views'));
@@ -148,10 +151,17 @@ io.on('connection', function(socket){
   areeb sokcet
    */
     socket.on('usrname', function (data) {
-        socket.emit('usr', data);
+ //       socket.emit('usr', data);
+        socket.username = data;
+        usernames[data] = data;
+        socket.emit('usr', socket.username)
+        socket.room = 'room 1';
+        socket.join('room 1');
+        socket.emit('msg', 'you have connected to room 1');
+        socket.broadcast.to(socket.room).emit('msg', data + ' has connected to room 1')
     });
     socket.on('chatmessage', function (data) {
-        socket.emit('msg', data);
+        io.sockets.in(socket.room).emit('msg',socket.username, data);
         //socket.emit('data', data);
         console.log(data)});
   /*
