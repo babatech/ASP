@@ -192,21 +192,7 @@ function toggleMapPlanPanle() {
 $(document).ready(function(){
     initMap();
     var lastSend = 0;
-    $("#userLoginForm").submit(function(event) {
-      /*
-       @TODO: daniyal , Shoaib
-       yaha pay login request handle ho gi
-       */
-        return false;
-        var userLoginData= {
-            Action: "Login",
-            email: "shahab@bbs.com",
-            password: "1234"
-        };
-        socket.emit('login-user-request', userLoginData);
-
-        event.preventDefault();
-    });
+    // local-login
     $("#send-message").submit(function(event) {
         if(pos==null) return false;
 
