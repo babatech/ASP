@@ -126,7 +126,7 @@ function  setUserPosition(position) {
     map.setZoom(12);
     addMarker(marker,"Your location");
     //searchNearbyAttarctions(pos);
-    socket.emit('user-position', pos);
+    socket.emit('user-position', pos); // counter part socket.on in app.js
 }
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
@@ -212,12 +212,13 @@ $(document).ready(function(){
     $("#shareLocationForm").submit(function(event) {
         return false;
         if($(".shareLocationEmail").val()!=null ){
-            getbrowserGeolocation();
+            getbrowserGeolocation();    // change this function so that it gets user location continuously and upadate the
+                                        // backend about it.
             var shareLocation = {
                 pos: pos,
                 email: $(".shareLocationEmail").val()
             };
-            socket.emit('user-share-location', shareLocation);
+            socket.emit('user-share-location', shareLocation); // counter part socket.io in app.js
         }
 
 
