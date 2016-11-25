@@ -19,18 +19,18 @@ user['loginStatus'] = false;
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    console.log(req.get('host'));
-    if(typeof res.user !== "undefined" ){
-        console.log("define user");
-    }else{
-        console.log("not define user");
+    if (typeof req.session.passport.user !== "undefined" ){
+        user = req.session.passport.user;
     }
+    console.log(req.session.passport.user);
+
     header["title"] = 'Home';
     res.render('index', { header: header,user: user,title: 'Local guide' });
 });
 /* GET about page. */
 router.get('/about', function(req, res, next) {
     header["title"] = 'About Us';
+    //console.log(req.session);
     res.render('about', { header: header,user: user,title: 'About us'  });
 });
 
@@ -74,7 +74,7 @@ router.post('/login', passport.authenticate('local-login', {
 /*
  GET login with facebook request.
  */
-router.get('/loginfacebook', passport.authenticate('facebook', { scope : 'email' }));
+router.get('/loginfacebook', passport.authenticate('facebook', { scope : 'email,  user_birthday, user_location, user_work_history, user_hometown, user_photos' }));
 // handle the callback after facebook has authenticated the user
 router.get('/loginfacebook/callback',
     passport.authenticate('facebook', {

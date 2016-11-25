@@ -99,7 +99,8 @@ module.exports = function(passport) {
             // pull in our app id and secret from our auth.js file
             clientID        : configAuth.facebookAuth.clientID,
             clientSecret    : configAuth.facebookAuth.clientSecret,
-            callbackURL     : configAuth.facebookAuth.callbackURL
+            callbackURL     : configAuth.facebookAuth.callbackURL,
+            profileFields: ['id', 'emails', 'name'] //This
 
         },
 
@@ -145,7 +146,7 @@ module.exports = function(passport) {
                 user["token"]=token;
                 user["email"]=profile.emails[0].value;
                 user["status"]=true;
-                user["name"]=profile.name.givenName + ' ' + profile.name.familyName;
+                user["name"]=profile.name.givenName + ' ' + profile.name.familyName;;
                 user["avatar"]="";
                 user["loginStatus"]=true;
                 return done(null, user);
