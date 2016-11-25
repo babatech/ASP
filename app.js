@@ -1,4 +1,5 @@
 var express = require('express');
+var session = require('express-session');
 var socket_io = require('socket.io');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -9,8 +10,11 @@ var sanitizer = require('sanitizer');
 var googleMapsClient = require('@google/maps').createClient({
   key: 'AIzaSyCPRT3eQNIcTUgj5mSHT5AA6qJ_NG3MCj4'
 });
+var passport = require('passport');
+var flash = require('connect-flash');
 outputarr = [];
 
+require('./config/passport')(passport); // pass passport for configuration
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
@@ -33,6 +37,16 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+// required for passport
+app.use(session({
+    secret: 'shoaibishappyinkiel',
+    resave: true,
+    saveUninitialized: true
+} )); // session secret
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+app.use(flash()); // use connect-flash for flash messages stored in session
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
@@ -94,6 +108,17 @@ io.on('connection', function(socket){
     console.log('location:' + data.lat +":"+ data.lng);
   });
 
+  socket.on('login-user-request', function(data){
+    /*
+     @Todo: daniyal
+     yah app ka starting point hai yaha app ko login k data malay ga
+     */
+
+
+    console.log(data);
+
+  });
+
   socket.on('disconnect', function(){
     console.log('user disconnected');
   });
@@ -111,6 +136,19 @@ io.on('connection', function(socket){
     io.emit('data', data);
 
   });
+  /*
+  areeb sokcet
+   */
+    socket.on('usrname', function (data) {
+        socket.emit('usr', data);
+    });
+    socket.on('chatmessage', function (data) {
+        socket.emit('msg', data);
+        //socket.emit('data', data);
+        console.log(data)});
+  /*
+  areeb sokcet
+   */
 });
 
 // Geocode an address.
@@ -159,5 +197,7 @@ function processnearbyplace(result){
 
   }
 }
+function setUserDataInSession(data) {
 
+}
 module.exports = app;

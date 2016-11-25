@@ -1,38 +1,27 @@
 extends layout
-
 block content
   div.container
-    div.row.map-city-panel
-      div.col-md-12
-        a.btn.btn-primary.toggle-map-plan-panel.get-current-location(datatype=".map-plan-panel") Use my current location
-        hr
-        form(action="",method=post)
-          div.form-group
-            div.col-sm-4.col-md-3.col-lg-2
-              label.control-label(for="searchcity")
-            div.col-sm-4
-              input.form-control(type="text")#searchcity
-            div.col-sm-2
-            a.btn.btn-success.toggle-map-plan-panel(datatype=".map-plan-panel") select city
-
-
-    div.row.hidden.map-plan-panel
+    div.row
       div.col-md-12
         h1= title
       div.col-md-6
         div.full-height.full-width
           div#map
       div.col-md-6
-        form(action="",method=post)
-          div.panel-group
+        div.panel-group
             div.panel.panel-primary.add-after-panel
               div.panel-heading
-                h2#startingtitle Startinf point
+                h2.chatCityName chat
               div.panel-body
-                p#startingdescription
-            div.panel.panel-primary
-              div.panel-heading
-                h2#endingtitle ending point
-              div.panel-body
-                p#endingdescription
+                p#startingdescription.chathistrydisplay
+
       div.col-md-12
+        div#messages
+
+      div.col-md-12
+        div#form
+          form(action="", method='post').chatInCityForm
+            input#m(autocomplete="off")
+            button#b Send
+
+

@@ -13,7 +13,7 @@ $('.btn-login-facebook').bind('click', function() {
     FB.login(handleSessionResponse);
 });
 
-/*
+/* bind click to logout button daniyal syed Ali
  $('#logout').bind('click', function() {
  FB.logout(handleSessionResponse);
  });*/
@@ -34,23 +34,50 @@ var map;
 var pos;
 var placeService;
 var geocoder;
+var autocomplete;
 
 function initMap() {
-    if(map.undefined){
-        map = new google.maps.Map(document.getElementById('map'), {
+    var mapelemtn =document.getElementById('map');
+    if (typeof mapelemtn !== 'undefined'){
+        //alert();
+    }
+    if(typeof map === 'undefined' && typeof mapelemtn !== 'undefined' ){
+
+        map = new google.maps.Map(mapelemtn, {
             zoom: 2,
             center: {lat: 0, lng: 0}
         });
     }
-    if(geocoder.undefined){
+    if(typeof geocoder === 'undefined'){
         geocoder = new google.maps.Geocoder;
     }
-    if(placeService.undefined){
+    if(typeof placeService === 'undefined'){
         placeService = new google.maps.places.PlacesService(map);
+    }
+    if(typeof autocomplete === 'undefined'){
+
+        autocomplete = new google.maps.places.Autocomplete(document.getElementById('searchcity'), { types: [ 'geocode' ] });
+        google.maps.event.addListener(autocomplete, 'place_changed', function() {
+
+            var place = autocomplete.getPlace();
+            console.log(place);
+
+            var lat = place.geometry.location.lat(),
+                lng = place.geometry.location.lng();
+            pos = {
+                lat: lat,
+                lng: lng
+            };
+// Then do whatever you want with them
+            toggleMapPlanPanle();
+            setUserPosition(pos);
+            console.log(lat);
+            console.log(lng);
+        });
     }
 }
 function getbrowserGeolocation() {
-    initMap()
+
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             pos = {
@@ -66,7 +93,25 @@ function getbrowserGeolocation() {
         handleLocationError(false, infoWindow, map.getCenter());
     }
 }
+function RefershUSERGeolocation() {
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            pos = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            };
+
+            //setUserPosition(pos)
+        }, function() {
+            handleLocationError(true, infoWindow, map.getCenter());
+        });
+    } else {
+        handleLocationError(false, infoWindow, map.getCenter());
+    }
+}
 function  setUserPosition(position) {
+    initMap();
     var latLng = new google.maps.LatLng(position.lat, position.lng);
     // Creating a marker and putting it on the map
     var marker = new google.maps.Marker({
@@ -133,18 +178,42 @@ function geocodeLatLng(position) {
         }
     });
 }
+function toggleMapPlanPanle() {
+    if(typeof pos !== 'undefined'){
+        $( ".map-plan-panel" ). toggleClass( "hidden" );
+        $( ".map-city-panel" ). toggleClass( "hidden" );
+        //alert("not empty");
+    }else{
+        //alert("empty");
+    }
+
+}
 
 $(document).ready(function(){
     initMap();
     var lastSend = 0;
+    $("#userLoginForm").submit(function(event) {
+      /*
+       @TODO: daniyal , Shoaib
+       yaha pay login request handle ho gi
+       */
+        return false;
+        var userLoginData= {
+            Action: "Login",
+            email: "shahab@bbs.com",
+            password: "1234"
+        };
+        socket.emit('login-user-request', userLoginData);
+
+        event.preventDefault();
+    });
     $("#send-message").submit(function(event) {
         if(pos==null) return false;
 
         event.preventDefault();
     });
     $( ".toggle-map-plan-panel" ).click(function() {
-        $( ".map-plan-panel" ). toggleClass( "hidden" );
-        $( ".map-city-panel" ). toggleClass( "hidden" );
+        toggleMapPlanPanle()
     });
     $( ".get-current-location" ).click(function() {
         getbrowserGeolocation();
@@ -155,6 +224,7 @@ $(document).ready(function(){
     and see app.js file for server side function for handling the user submission
      */
     $("#shareLocationForm").submit(function(event) {
+        return false;
         if($(".shareLocationEmail").val()!=null ){
             getbrowserGeolocation();
             var shareLocation = {
@@ -167,6 +237,25 @@ $(document).ready(function(){
 
         event.preventDefault();
     });
+
+/*
+areeb ready function area start
+ */
+    $('.chatInCityForm').submit(function(){
+        socket.emit('chatmessage', $('#m').val());
+        $('#m').val('');
+        return false;
+    });
+/*
+areeb ready function area end
+ */
+
+    /*window.setInterval(function(){
+        /// call your function here
+        RefershUSERGeolocation();
+    }, 2000);*/
+
+
 });
 
 socket.on('nearbyplaces', function(data){
@@ -295,4 +384,28 @@ function addPanel(newpanel) {
 /*
 @todo: all, areeb,waqar,shoaib,daniyal,shahab,mir
 add your frontend javascript here
+ */
+
+/*
+areeb js function area start
+ */
+socket.on('connect', function () {
+    socket.emit('usrname', prompt("What is your name ? "));
+});
+
+socket.on('usr', function (data) {
+    socket.username = data;
+});
+
+socket.on('msg' ,function (data) {
+    //$('#messages').append(socket.username, " : "+data+"<br/>");
+    $('#startingdescription').append(socket.username, " : "+data+"<br/>");
+    var infoWindow = new google.maps.InfoWindow({map: map});
+    infoWindow.setPosition(pos);
+    infoWindow.setContent(data);
+    setTimeout(function(){infoWindow.close();}, '5000');
+});
+
+/*
+areeb js function area end
  */
