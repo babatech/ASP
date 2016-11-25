@@ -2,6 +2,20 @@ extends layout
 
 block content
   div.container
+    div.row.map-city-panel
+      div.col-md-12
+        a.btn.btn-primary.toggle-map-plan-panel.get-current-location(datatype=".map-plan-panel") Use my current location
+        hr
+        form(action="",method=post)
+          div.form-group
+            div.col-sm-4.col-md-3.col-lg-2
+              label.control-label(for="searchcity")
+            div.col-sm-4
+              input.form-control(type="text")#searchcity
+            div.col-sm-2
+            a.btn.btn-success.toggle-map-plan-panel.get-search-city(datatype=".map-plan-panel") select city
+
+
     div.row
       div.col-md-12
         h1= title

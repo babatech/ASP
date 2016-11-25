@@ -1,0 +1,27 @@
+extends layout
+block content
+  div.container
+    div.row
+      div.col-md-12
+        h1= title
+      div.col-md-6
+        div.full-height.full-width
+          div#map
+      div.col-md-6
+        div.panel-group
+            div.panel.panel-primary.add-after-panel
+              div.panel-heading
+                h2.chatCityName chat
+              div.panel-body
+                p#startingdescription.chathistrydisplay
+
+      div.col-md-12
+        div#messages
+
+      div.col-md-12
+        div#form
+          form(action="", method='post').chatInCityForm
+            input#m(autocomplete="off")
+            button#b Send
+
+

@@ -5,50 +5,50 @@ div.navbar.navbar-inverse.navbar-fixed-top(role='navigation')
                 span.icon-bar
                 span.icon-bar
                 span.icon-bar
-            a.navbar-brand(href="./")
+            a.navbar-brand(href="#{header.baseurl}")
                 | Advance Software Programing
         div.collapse.navbar-collapse
             ul.nav.navbar-nav
                 li.active
-                    a(href="./") Home
+                    a(href="#{header.baseurl}") Home
                 li
-                    a(href="./about") About
+                    a(href="#{header.baseurl}/about") About
                 li
-                    a(href="./contact") Contact
+                    a(href="#{header.baseurl}/contact") Contact
             ul.nav.navbar-nav.navbar-right
-                if user.status && user.status === false
+                if  user.status == false
                     li.login-click.dropdown
                         a(href="#login",data-toggle="dropdown").dropdown-toggle login
                         div.dropdown-menu.dropdown-login
                             div.dropdown-header
                                 h4 Login
                             div.dropdown-body
-                                 div.col-md-12
-                                     form(action="#",method="POST")
-                                         div.form-group
-                                             label Username
-                                             input(type="text",name="username").form-control
-                                             p.help-block Please enter your username here
-                                         div.form-group
-                                             label Password
-                                             input(type="password",name="password").form-control
-                                         div.checkbox
-                                             label remember me
+                                div.col-md-12
+                                    form(name="userLoginForm",action="#{header.baseurl}/login",method="POST")#userLoginForm.userLoginForm
+                                        div.form-group
+                                            label Username
+                                            input(type="text",name="username").form-control
+                                            p.help-block Please enter your username here
+                                        div.form-group
+                                            label Password
+                                            input(type="password",name="password").form-control
+                                        div.checkbox
+                                            label remember me
                                                 input(type="checkbox",name="rememberme")
-                                         button.btn.btn-primary.btn-block(type="submit") login
-                                         hr
-                                         a.btn.btn-block.btn-login-facebook(href="#") Login with
-                                         f
+                                        button.btn.btn-primary.btn-block(type="submit") login
+                                        hr
+                                        a.btn.btn-block.btn-login-facebook(href="#{header.baseurl}/loginfacebook") Login with Facebook
+                                        a.btn.btn-block.btn-login-facebook(href="#{header.baseurl}/signup") Register
+
                 else
-                    li.login-click.dropdown
-                        a(href="#login",data-toggle="dropdown").dropdown-toggle login
+
+                    li.userdetail.dropdown
+                        a(href="#logout",data-toggle="dropdown").dropdown-toggle  #{user.name}
                         div.dropdown-menu
                             div.dropdown-header
-                                h4 Login
+                                h4 #{user.name}
                             div.dropdown-body
                                 div.col-md-12
-                                    a(href="#logout").btn.btn-default.logout-click logout
+                                    a(href="#{header.baseurl}/logout").btn.btn-default.logout-click logout
 
-                    li.userdetail
-                        p #{user.username}
 

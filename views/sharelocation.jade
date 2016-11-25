@@ -1,0 +1,34 @@
+extends layout
+
+block content
+  div.container
+    div.row.share-location-buddy
+      div.col-md-12
+        form#shareLocationForm(name="shareLocationForm",action="",method="POST")
+          div.form-group
+            div.col-sm-4
+              label.control-label(for="shareLocationEmail") Enter email of person you want to share your location with
+            div.col-sm-4
+              input(type="email",name="shareLocationEmail").form-control.shareLocationEmail#shareLocationEmail
+            div.col-sm-2
+              input.btn.btn-success.toggle-map-share-panel(type="submit",value="Submit")
+
+
+    div.row.map-share-panel
+      div.col-md-12
+        h1= title
+      div.col-md-9
+        div.full-height.full-width
+          div#map
+      div.col-md-3
+        div.panel-group
+          div.panel.panel-primary.add-after-panel
+            div.panel-heading
+                h2#startingtitle Your location
+            div.panel-body
+                p#startingdescription
+          div.panel.panel-primary
+              div.panel-heading
+                h2#endingtitle Your buddy Location
+              div.panel-body
+                p#endingdescription

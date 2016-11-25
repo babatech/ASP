@@ -21,3 +21,28 @@ body { padding-top: 60px; }
 
     height: 100%;
 }
+.chatInCityForm{
+    border: 4px solid black;
+    width: 50%;
+    height: 50%;
+}
+.chathistrydisplay{
+    max-height: 200px;
+    overflow: scroll;
+}
+#m{
+    width: 90%;
+    height: 100%;
+}
+#b{
+    width: 10%;
+    background: rgb(130, 224, 255);
+}
+
+#message{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width:50%;
+    background: #eee;
+}
