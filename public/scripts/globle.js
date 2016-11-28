@@ -35,7 +35,7 @@ var pos;
 var placeService;
 var geocoder;
 var autocomplete;
-
+var cityn;
 
 function initMap() {
     var mapelemtn =document.getElementById('map');
@@ -75,7 +75,9 @@ function initMap() {
             console.log(lat);
             console.log(lng);
         });
+
     }
+
 }
 function getbrowserGeolocation() {
 
@@ -170,7 +172,8 @@ function geocodeLatLng(position) {
     geocoder.geocode({'location': position}, function(results, status) {
         if (status === 'OK') {
             if (results[1]) {
-                setStartLocation(position,results[1].formatted_address,results[1])
+                setStartLocation(position,results[1].formatted_address,results[1]);
+                socket.emit("cityn", results[1].formatted_address);
             } else {
                 window.alert('No results found');
             }
@@ -190,6 +193,15 @@ function toggleMapPlanPanle() {
 
 }
 
+/*
+areeb cityname start
+ */
+
+
+/*
+areeb cityname code end
+ */
+
 $(document).ready(function(){
     initMap();
     var lastSend = 0;
@@ -206,9 +218,9 @@ $(document).ready(function(){
         getbrowserGeolocation();
     });
     /*
-    @todo:waqar
-    this the function for submiting user input for email and user location
-    and see app.js file for server side function for handling the user submission
+     @todo:waqar
+     this the function for submiting user input for email and user location
+     and see app.js file for server side function for handling the user submission
      */
     $("#shareLocationForm").submit(function(event) {
         return false;
@@ -225,29 +237,34 @@ $(document).ready(function(){
         event.preventDefault();
     });
 
-/*
-areeb ready function area start
- */
+    /*
+     areeb ready function area start
+     */
     $('.chatInCityForm').submit(function(){
         socket.emit('chatmessage', $('#m').val());
         $('#m').val('');
         return false;
     });
     $( ".startchatbtn" ).click(function() {
-        socket.emit('usrname', prompt("What is your name ? "));
+        //socket.emit('usrname', prompt("What is your name ? "));
+
+        do{
+            var name = prompt("What is your name ? ");
+        }while(name == '');
+        socket.emit('usrname', name);
         $( ".formUserChat" ). toggleClass( "hidden" );
         $( ".startchatpanel" ). toggleClass( "hidden" );
 
     });
 
-/*
-areeb ready function area end
- */
+    /*
+     areeb ready function area end
+     */
 
     /*window.setInterval(function(){
-        /// call your function here
-        RefershUSERGeolocation();
-    }, 2000);*/
+     /// call your function here
+     RefershUSERGeolocation();
+     }, 2000);*/
 
 
 });
@@ -376,15 +393,21 @@ function addPanel(newpanel) {
 }
 
 /*
-@todo: all, areeb,waqar,shoaib,daniyal,shahab,mir
-add your frontend javascript here
+ @todo: all, areeb,waqar,shoaib,daniyal,shahab,mir
+ add your frontend javascript here
  */
 
 /*
-areeb js function area start
+ areeb js function area start
  */
+
+
+
+
+
+
 socket.on('connect', function () {
-   // socket.emit('usrname', prompt("What is your name ? "));
+    // socket.emit('usrname', prompt("What is your name ? "));
 
 });
 
@@ -402,5 +425,5 @@ socket.on('msg' ,function (usr, data) {
 });
 
 /*
-areeb js function area end
+ areeb js function area end
  */

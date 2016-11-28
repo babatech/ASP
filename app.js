@@ -8,7 +8,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var sanitizer = require('sanitizer');
 var googleMapsClient = require('@google/maps').createClient({
-  key: 'AIzaSyCPRT3eQNIcTUgj5mSHT5AA6qJ_NG3MCj4'
+    key: 'AIzaSyCPRT3eQNIcTUgj5mSHT5AA6qJ_NG3MCj4'
 });
 var passport = require('passport');
 var flash = require('connect-flash');
@@ -26,6 +26,7 @@ app.io = io;
 
 var usernames={};
 var rooms = ['Kiel, Germany', 'Hamburg, Germany'];
+var cityn;
 
 // view engine setup
 
@@ -56,9 +57,9 @@ app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 
 
@@ -67,96 +68,114 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
+    app.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: err
+        });
     });
-  });
 }
 
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
+    res.status(err.status || 500);
+    res.render('error', {
+        message: err.message,
+        error: {}
+    });
 });
 
 io.on('connection', function(socket){
-  console.log('new user connected');
+    console.log('new user connected');
 
-  socket.on('data', function(data){
-    // limit chars
-    data.message = data.message.substring(0,200);
+    socket.on('data', function(data){
+        // limit chars
+        data.message = data.message.substring(0,200);
 
-    // sanitaze html
-    data.message = sanitizer.escape(data.message);
+        // sanitaze html
+        data.message = sanitizer.escape(data.message);
 
-    io.emit('data', data);
-    console.log('message:' + data.message);
-  });
-  socket.on('user-position', function(data){
+        io.emit('data', data);
+        console.log('message:' + data.message);
+    });
+    socket.on('user-position', function(data){
 
-    // sanitaze html
-    data.lat = sanitizer.escape(data.lat);
-    data.lng = sanitizer.escape(data.lng);
-    //getnearbyPlaces(data);
-    //io.emit('nearbyplaces', outputarr);
-    console.log(outputarr);
-    console.log('location:' + data.lat +":"+ data.lng);
-  });
+        // sanitaze html
+        data.lat = sanitizer.escape(data.lat);
+        data.lng = sanitizer.escape(data.lng);
+        //getnearbyPlaces(data);
+        //io.emit('nearbyplaces', outputarr);
+        console.log(outputarr);
+        console.log('location:' + data.lat +":"+ data.lng);
+    });
 
-  socket.on('login-user-request', function(data){
-    /*
-     @Todo: daniyal
-     yah app ka starting point hai yaha app ko login k data malay ga
-     */
+    socket.on('login-user-request', function(data){
+      /*
+       @Todo: daniyal
+       yah app ka starting point hai yaha app ko login k data malay ga
+       */
 
 
-    console.log(data);
+        console.log(data);
 
-  });
+    });
 
-  socket.on('disconnect', function(){
-    console.log('user disconnected');
-  });
+    socket.on('disconnect', function(){
+        console.log('user disconnected');
+    });
   /*
    @todo waqar
    this the function where share location form submission is handled
    */
-  socket.on('user-share-location', function(data){
+    socket.on('user-share-location', function(data){
 
-    // sanitaze html
-    data.pos.lat = sanitizer.escape(data.pos.lat);
-    data.pos.lng = sanitizer.escape(data.pos.lng);
+        // sanitaze html
+        data.pos.lat = sanitizer.escape(data.pos.lat);
+        data.pos.lng = sanitizer.escape(data.pos.lng);
 
 
-    io.emit('data', data);
+        io.emit('data', data);
 
-  });
+    });
   /*
-  areeb sokcet
+   areeb sokcet
    */
+
+    socket.on("cityn", function (city) {
+        console.log(city);
+        cityn = city;
+    })
     socket.on('usrname', function (data) {
- //       socket.emit('usr', data);
+        //       socket.emit('usr', data);
         socket.username = data;
         usernames[data] = data;
-        socket.emit('usr', socket.username)
-        socket.room = 'room 1';
-        socket.join('room 1');
-        socket.emit('msg', 'you have connected to room 1');
-        socket.broadcast.to(socket.room).emit('msg', data + ' has connected to room 1')
+        socket.emit('usr', socket.username);
+        for (var i=0;i<=rooms.length;i++){
+          if (cityn.indexOf(rooms[i]) >=0){
+            console.log("city found");
+            socket.room = cityn;
+            socket.join(cityn);
+            socket.emit('msg', 'you have connected to '+cityn);
+            socket.broadcast.to(socket.room).emit('msg', data + ' has connected to '+cityn);
+            break;
+          }else{
+            //if city not found
+            socket.room = cityn;
+            socket.join(cityn);
+            socket.emit('msg', 'you have connected to '+cityn);
+            socket.broadcast.to(socket.room).emit('msg', data + ' has connected to '+cityn);
+          }
+        }
+
     });
     socket.on('chatmessage', function (data) {
         io.sockets.in(socket.room).emit('msg',socket.username, data);
         //socket.emit('data', data);
         console.log(data)});
   /*
-  areeb sokcet
+   areeb sokcet
    */
 });
 
@@ -170,41 +189,41 @@ io.on('connection', function(socket){
  });*/
 
 function  getnearbyPlaces(position,type) {
-  outputarr = [];
-  googleMapsClient.placesNearby({
-    location: [position.lat, position.lng],
-    opennow: true,
-    radius: 3000,
-    type: 'museum'
-  }, function(err, response) {
-    if (!err) {
-      processnearbyplace(response.json.results);
-      io.emit('nearbyplaces', outputarr);
-    }
-  });
+    outputarr = [];
+    googleMapsClient.placesNearby({
+        location: [position.lat, position.lng],
+        opennow: true,
+        radius: 3000,
+        type: 'museum'
+    }, function(err, response) {
+        if (!err) {
+            processnearbyplace(response.json.results);
+            io.emit('nearbyplaces', outputarr);
+        }
+    });
 
-  //console.log(outputarr);
+    //console.log(outputarr);
 }
 
 function processnearbyplace(result){
 
-  for (var i = 0; i < result.length; i++) {
-    var obj = result[i];
-    temp = {
-      id: sanitizer.escape(obj['id']),
-      place_id: sanitizer.escape(obj['place_id']),
-      title: sanitizer.escape(obj['name']),
-      geometry: sanitizer.escape(obj['geometry']['location']),
-      lat:sanitizer.escape(obj['geometry']['location']['lat']),
-      lan: sanitizer.escape(obj['geometry']['location']['lng']),
-      icon: sanitizer.escape(obj['icon'])
-    };
+    for (var i = 0; i < result.length; i++) {
+        var obj = result[i];
+        temp = {
+            id: sanitizer.escape(obj['id']),
+            place_id: sanitizer.escape(obj['place_id']),
+            title: sanitizer.escape(obj['name']),
+            geometry: sanitizer.escape(obj['geometry']['location']),
+            lat:sanitizer.escape(obj['geometry']['location']['lat']),
+            lan: sanitizer.escape(obj['geometry']['location']['lng']),
+            icon: sanitizer.escape(obj['icon'])
+        };
 
-    //console.log(temp);
-    outputarr.push(temp);
+        //console.log(temp);
+        outputarr.push(temp);
 
 
-  }
+    }
 }
 function setUserDataInSession(data) {
 
