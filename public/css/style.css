@@ -7,7 +7,6 @@ body { padding-top: 60px; }
     height: 100%;
     width: 100%;
     min-height: 300px;
-
     margin: 0 auto;
 }
 
@@ -45,4 +44,20 @@ body { padding-top: 60px; }
     padding: 0;
     width:50%;
     background: #eee;
+}
+/* CSS REQUIRED */
+.state-icon {
+    left: -5px;
+}
+.list-group-item-primary {
+    color: rgb(255, 255, 255);
+    background-color: rgb(66, 139, 202);
+}
+
+/* DEMO ONLY - REMOVES UNWANTED MARGIN */
+.well .list-group {
+    margin-bottom: 0px;
+}
+.checkbox input[type="checkbox"].rememberme{
+    margin-left: 0;
 }

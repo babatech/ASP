@@ -19,7 +19,10 @@ block content
         div#messages
 
       div.col-md-12
-        div#form
+        div.startchatpanel
+          a.btn.btn-primary.startchatbtn(href="#") Start Chat
+
+        div.formUserChat.hidden
           form(action="", method='post').chatInCityForm
             input#m(autocomplete="off")
             button#b Send

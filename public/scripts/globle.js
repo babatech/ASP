@@ -35,7 +35,11 @@ var pos;
 var placeService;
 var geocoder;
 var autocomplete;
+var cityn;
 var positionTimer,usermarker,shareusermarker;
+var NearbyAttarctions={};
+var selectedNearbyAttarctions={};
+
 
 function initMap() {
     var mapelemtn =document.getElementById('map');
@@ -126,7 +130,7 @@ function  setUserPosition(position) {
     map.setCenter(position);
     map.setZoom(12);
     addMarker(usermarker,"Your location");
-    //searchNearbyAttarctions(pos);
+    searchNearbyAttarctions(pos);
     socket.emit('user-position', pos);
 }
 
@@ -170,7 +174,8 @@ function geocodeLatLng(position) {
     geocoder.geocode({'location': position}, function(results, status) {
         if (status === 'OK') {
             if (results[1]) {
-                setStartLocation(position,results[1].formatted_address,results[1])
+                setStartLocation(position,results[1].formatted_address,results[1]);
+                socket.emit("cityn", results[1].formatted_address);
             } else {
                 window.alert('No results found');
             }
@@ -200,11 +205,22 @@ $(document).ready(function(){
         event.preventDefault();
     });
     $( ".toggle-map-plan-panel" ).click(function() {
-        toggleMapPlanPanle()
+        $( ".map-plan-panel" ). toggleClass( "hidden" );
+        $( ".map-city-panel" ). toggleClass( "hidden" );
     });
     $( ".get-current-location" ).click(function() {
         getbrowserGeolocation();
     });
+    $(document).on('change', '.addselectedNearbyAttarction[type=checkbox]', function() {
+
+        if($( this ).is(":checked")) {
+        var placeID= $( this ).val();
+            addselectedNearbyAttarction(placeID);
+            createMarker(selectedNearbyAttarctions[placeID]);
+            //console.log(placeID);
+        }
+    });
+
     /*
     @todo:waqar
     this the function for submiting user input for email and user location
@@ -262,6 +278,20 @@ areeb ready function area start
         $('#m').val('');
         return false;
     });
+    $( ".startchatbtn" ).click(function() {
+        getbrowserGeolocation();
+        //socket.emit('usrname', prompt("What is your name ? "));
+        //prompt user if field is empty
+        do{
+            var name = prompt("What is your name ? ");
+        }while(name == '');
+        socket.emit('usrname', name);
+        // socket.emit('usrname', prompt("What is your name ? "));
+        $( ".formUserChat" ). toggleClass( "hidden" );
+        $( ".startchatpanel" ). toggleClass( "hidden" );
+
+    });
+
 /*
 areeb ready function area end
  */
@@ -342,13 +372,15 @@ function searchNearbyAttarctions(position) {
 function processNearbyAttarctions(results, status) {
     if (status === google.maps.places.PlacesServiceStatus.OK) {
         for (var i = 0; i < results.length; i++) {
-            createMarker(results[i]);
+            //createMarker(results[i]);
+            makePanel(results[i]);
+            NearbyAttarctions[results[i].id]=results[i];
         }
     }
 }
 
 function createMarker(place) {
-    makePanel(place);
+    //makePanel(place);
     var placeLoc = place.geometry.location;
     var marker = new google.maps.Marker({
         map: map,
@@ -364,12 +396,12 @@ function createMarker(place) {
 
 function makePanel(place) {
     //console.log(place);
-    var newpanel = document.createElement("div");
-    newpanel.className="panel panel-default";
+    var newpanel = document.createElement("li");
+    newpanel.className="list-group-item";
     newpanel.id=place.id;
 
     var newpanelbody = document.createElement("div");
-    newpanelbody.className="panel-body";
+    newpanelbody.className="";
 
     var newpanelbodyrow = document.createElement("div");
     newpanelbodyrow.className="row";
@@ -382,8 +414,13 @@ function makePanel(place) {
     newpanelbodycoldes.className="col-sm-6";
     newpanelbodycoldes.innerHTML='<p><strong>'+place.name+'</strong></br>'+place.name+'</p>';
 
+    var newpanelbodycolcheckbox = document.createElement("div");
+    newpanelbodycolcheckbox.className="col-sm-2";
+    newpanelbodycolcheckbox.innerHTML='<div class="checkbox checkbox-primary"><label><input type="checkbox" class="addselectedNearbyAttarction" value="'+place.id+'"></label></div>';
+
     newpanelbodyrow.appendChild(newpanelbodycolimage);
     newpanelbodyrow.appendChild(newpanelbodycoldes);
+    newpanelbodyrow.appendChild(newpanelbodycolcheckbox);
 
 
     newpanelbody.appendChild(newpanelbodyrow);
@@ -394,7 +431,8 @@ function makePanel(place) {
 }
 
 function addPanel(newpanel) {
-    $(newpanel).insertAfter(".add-after-panel");
+    //$(newpanel).insertAfter(".add-after-panel");
+    $(".place-select-list-checkbox").append(newpanel);
 }
 
 /*
@@ -406,16 +444,19 @@ add your frontend javascript here
 areeb js function area start
  */
 socket.on('connect', function () {
-    socket.emit('usrname', prompt("What is your name ? "));
+   // socket.emit('usrname', prompt("What is your name ? "));
+
 });
 
 socket.on('usr', function (data) {
     socket.username = data;
 });
 
-socket.on('msg' ,function (data) {
+socket.on('msg' ,function (usr, data) {
     //$('#messages').append(socket.username, " : "+data+"<br/>");
-    $('#startingdescription').append(socket.username, " : "+data+"<br/>");
+    $('#startingdescription').append(usr, " : "+data+"<br/>");
+    $("#startingdescription").scrollTop($("#startingdescription")[0].scrollHeight);
+
     var infoWindow = new google.maps.InfoWindow({map: map});
     infoWindow.setPosition(pos);
     infoWindow.setContent(data);
@@ -449,3 +490,10 @@ socket.on('get-user-location-request', function(data){
 socket.on('share-user-not-online', function(data){
     alert("user not active on site");
 });
+
+function addselectedNearbyAttarction(placeID) {
+    if(typeof autocomplete !== 'undefined'){
+        selectedNearbyAttarctions[placeID]=NearbyAttarctions[placeID];
+    }
+
+}

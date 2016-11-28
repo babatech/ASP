@@ -4,16 +4,16 @@
 var LocalStrategy   = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
 var TwitterStrategy = require('passport-twitter').Strategy;
-var usermodule = require('../models/user');
 
-// load up the user model
-var User       		= require('../models/user');
+
 
 // load the auth variables
 var configAuth = require('./auth');
 
 // expose this function to our app using module.exports
-module.exports = function(passport) {
+module.exports = function(passport,databaseConnection) {
+    // load up the user model
+    var usermodule       		= require('../models/user')(databaseConnection);
 
     // =========================================================================
     // passport session setup ==================================================
@@ -36,34 +36,37 @@ module.exports = function(passport) {
     // =========================================================================
     // we are using named strategies since we have one for login and one for signup
     // by default, if there was no name, it would just be called 'local'
-
     passport.use('local-login', new LocalStrategy({
             // by default, local strategy uses username and password, we will override with email
-            usernameField : 'email',
+            usernameField : 'username',
             passwordField : 'password',
             passReqToCallback : true // allows us to pass back the entire request to the callback
         },
         function(req, email, password, done) { // callback with email and password from our form
-console.log('here passport');
+
             var user={};
-
-            var result = usermodule.login(email,password);
-            if(result == null )
-            {
-                console.log('null data');
+            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            if(re.test(email)) {
+                var result = usermodule.login(email,password);
+                if(result === true )
+                {
+                    console.log('usercraeted');
+                    user["email"]=email;
+                    user["status"]=true;
+                    user["name"]="John Snow";
+                    user["avatar"]="";
+                    user["loginStatus"]=true;
+                    return done(null, user);
+                }else{
+                    user["msg"]="User not exists";
+                    console.log('error ');
+                }
             }else{
-                console.log('usercraeted');
-                user["email"]=email;
-                user["status"]=true;
-                user["name"]="John Snow";
-                user["avatar"]="";
-                user["loginStatus"]=true;
+                user["msg"]="invalide email";
+                console.log("out");
             }
-            /*
-            database check here
-             */
-            return done(null, user);
 
+            return done(null, false,user["msg"]);
         }));
 
 
@@ -85,26 +88,26 @@ console.log('here passport');
             // asynchronous
             // User.findOne wont fire unless data is sent back
             process.nextTick(function() {
-
-                var result = usermodule.createuser(email,password);
-
                 var user={};
-                if(result == true )
-                {
-                    console.log('usercraeted');
-                    user["email"]=email;
-                    user["status"]=true;
-                    user["name"]="John Snow";
-                    user["avatar"]="";
-                    user["loginStatus"]=true;
+                var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                if(re.test(email)) {
+                    var result = usermodule.createuser(email,password);
+                    if(result === true )
+                    {
+                        //console.log('usercraeted');
+                        user["email"]=email;
+                        user["status"]=true;
+                        user["name"]="John Snow";
+                        user["avatar"]="";
+                        user["loginStatus"]=true;
 
+                    }else{
+
+                        console.log('error ');
+                    }
                 }else{
-
-                    console.log('error ');
+                    console.log("out");
                 }
-                /*
-                 database check here
-                 */
                 return done(null, user);
 
             });
@@ -164,7 +167,7 @@ console.log('here passport');
                 var user={};
 
 
-                var result = usermodule.login(profile.emails[0].value,profile.id);
+                var result = usermodule.fblogin(profile.emails[0].value,profile.id);
 
 
                 user["id"]=profile.id;
