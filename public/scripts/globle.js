@@ -131,7 +131,7 @@ function  setUserPosition(position) {
     map.setCenter(position);
     map.setZoom(12);
     addMarker(marker,"Your location");
-    //searchNearbyAttarctions(pos);
+    searchNearbyAttarctions(pos);
     socket.emit('user-position', pos);
 }
 
@@ -282,7 +282,7 @@ $(document).ready(function(){
         //prompt user if field is empty
         do{
             var name = prompt("What is your name ? ");
-        }while(name.replace(/\s/g, '') == '');
+        }while(name == '');
         socket.emit('usrname', name);
         // socket.emit('usrname', prompt("What is your name ? "));
         $( ".formUserChat" ). toggleClass( "hidden" );
