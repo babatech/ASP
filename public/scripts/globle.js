@@ -127,7 +127,7 @@ function  setUserPosition(position) {
     map.setCenter(position);
     map.setZoom(12);
     addMarker(usermarker,"Your location");
-    //searchNearbyAttarctions(pos);
+    searchNearbyAttarctions(pos);
     socket.emit('user-position', pos);
 }
 
@@ -201,7 +201,8 @@ $(document).ready(function(){
         event.preventDefault();
     });
     $( ".toggle-map-plan-panel" ).click(function() {
-        toggleMapPlanPanle()
+        $( ".map-plan-panel" ). toggleClass( "hidden" );
+        $( ".map-city-panel" ). toggleClass( "hidden" );
     });
     $( ".get-current-location" ).click(function() {
         getbrowserGeolocation();
@@ -372,12 +373,12 @@ function createMarker(place) {
 
 function makePanel(place) {
     //console.log(place);
-    var newpanel = document.createElement("div");
-    newpanel.className="panel panel-default";
+    var newpanel = document.createElement("li");
+    newpanel.className="list-group-item";
     newpanel.id=place.id;
 
     var newpanelbody = document.createElement("div");
-    newpanelbody.className="panel-body";
+    newpanelbody.className="";
 
     var newpanelbodyrow = document.createElement("div");
     newpanelbodyrow.className="row";
@@ -402,7 +403,8 @@ function makePanel(place) {
 }
 
 function addPanel(newpanel) {
-    $(newpanel).insertAfter(".add-after-panel");
+    //$(newpanel).insertAfter(".add-after-panel");
+    $(".place-select-list-checkbox").append(newpanel);
 }
 
 /*
