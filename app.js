@@ -155,26 +155,41 @@ io.on('connection', function(socket){
     socket.on("cityn", function (city) {
         console.log(city);
         cityn = city;
-    })
+    });
     socket.on('usrname', function (data) {
         //       socket.emit('usr', data);
         socket.username = data;
         usernames[data] = data;
         socket.emit('usr', socket.username);
         for (var i=0;i<=rooms.length;i++){
-          if (cityn.indexOf(rooms[i]) >=0){
-            console.log("city found");
-            socket.room = cityn;
-            socket.join(cityn);
-            socket.emit('msg', 'you have connected to '+cityn);
-            socket.broadcast.to(socket.room).emit('msg', data + ' has connected to '+cityn);
+
+          if (cityn === undefined || cityn === null || cityn === '')
+          {
+            cityn = '';
+            // socket.room = 'please select location first';
+            socket.emit('msg', 'Please select Location first ');
+            // socket.broadcast.to(socket.room).emit('msg', data + ' has connected to '+cityn);
             break;
-          }else{
-            //if city not found
-            socket.room = cityn;
-            socket.join(cityn);
-            socket.emit('msg', 'you have connected to '+cityn);
-            socket.broadcast.to(socket.room).emit('msg', data + ' has connected to '+cityn);
+          }
+          else
+          {
+              if (cityn.indexOf(rooms[i]) >=0)
+              {
+                console.log("city found");
+                socket.room = cityn;
+                socket.join(cityn);
+                socket.emit('msg', 'you have connected to '+cityn);
+                socket.broadcast.to(socket.room).emit('msg', data + ' has connected to '+cityn);
+                break;
+              }
+              else
+              {
+              //if city not found
+              socket.room = cityn;
+              socket.join(cityn);
+              socket.emit('msg', 'you have connected to '+cityn);
+              socket.broadcast.to(socket.room).emit('msg', data + ' has connected to '+cityn);
+              }
           }
         }
 
@@ -197,39 +212,39 @@ io.on('connection', function(socket){
  }
  });*/
 
-function  getnearbyPlaces(position,type) {
-  outputarr = [];
-  googleMapsClient.placesNearby({
-    location: [position.lat, position.lng],
-    opennow: true,
-    radius: 3000,
-    type: 'museum'
-  }, function(err, response) {
-    if (!err) {
-      processnearbyplace(response.json.results);
-      io.emit('nearbyplaces', outputarr);
-    }
-  });
+  function  getnearbyPlaces(position,type) {
+    outputarr = [];
+    googleMapsClient.placesNearby({
+      location: [position.lat, position.lng],
+      opennow: true,
+      radius: 3000,
+      type: 'museum'
+    }, function(err, response) {
+      if (!err) {
+        processnearbyplace(response.json.results);
+        io.emit('nearbyplaces', outputarr);
+      }
+    });
 
   //console.log(outputarr);
 }
 
 function processnearbyplace(result){
 
-  for (var i = 0; i < result.length; i++) {
-    var obj = result[i];
-    temp = {
-      id: sanitizer.escape(obj['id']),
-      place_id: sanitizer.escape(obj['place_id']),
-      title: sanitizer.escape(obj['name']),
-      geometry: sanitizer.escape(obj['geometry']['location']),
-      lat:sanitizer.escape(obj['geometry']['location']['lat']),
-      lan: sanitizer.escape(obj['geometry']['location']['lng']),
-      icon: sanitizer.escape(obj['icon'])
-    };
+    for (var i = 0; i < result.length; i++) {
+      var obj = result[i];
+      temp = {
+        id: sanitizer.escape(obj['id']),
+        place_id: sanitizer.escape(obj['place_id']),
+        title: sanitizer.escape(obj['name']),
+        geometry: sanitizer.escape(obj['geometry']['location']),
+        lat:sanitizer.escape(obj['geometry']['location']['lat']),
+        lan: sanitizer.escape(obj['geometry']['location']['lng']),
+        icon: sanitizer.escape(obj['icon'])
+      };
 
-    //console.log(temp);
-    outputarr.push(temp);
+      //console.log(temp);
+      outputarr.push(temp);
 
 
   }
