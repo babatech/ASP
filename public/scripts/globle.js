@@ -35,7 +35,10 @@ var pos;
 var placeService;
 var geocoder;
 var autocomplete;
+var cityn;
 var positionTimer,usermarker,shareusermarker;
+var NearbyAttarctions={};
+var selectedNearbyAttarctions={};
 
 
 function initMap() {
@@ -171,7 +174,8 @@ function geocodeLatLng(position) {
     geocoder.geocode({'location': position}, function(results, status) {
         if (status === 'OK') {
             if (results[1]) {
-                setStartLocation(position,results[1].formatted_address,results[1])
+                setStartLocation(position,results[1].formatted_address,results[1]);
+                socket.emit("cityn", results[1].formatted_address);
             } else {
                 window.alert('No results found');
             }
@@ -206,6 +210,28 @@ $(document).ready(function(){
     });
     $( ".get-current-location" ).click(function() {
         getbrowserGeolocation();
+    });
+    $(document).on('change', '.addselectedNearbyAttarction[type=checkbox]', function() {
+
+        if($( this ).is(":checked")) {
+        var placeID= $( this ).val();
+            addselectedNearbyAttarction(placeID);
+            createMarker(selectedNearbyAttarctions[placeID]);
+            console.log(placeID);
+        }
+    });
+    $(".checkbox").change(function() {
+        if(this.checked) {
+            addselectedNearbyAttarction(placeID);
+            createMarker(selectedNearbyAttarctions[placeID]);
+            console.log(placeID);
+        }
+    });
+    $( ".addselectedNearbyAttarction" ).click(function() {
+
+        addselectedNearbyAttarction(placeID);
+        createMarker(selectedNearbyAttarctions[placeID]);
+        console.log(placeID);
     });
     /*
     @todo:waqar
@@ -265,7 +291,13 @@ areeb ready function area start
         return false;
     });
     $( ".startchatbtn" ).click(function() {
-        socket.emit('usrname', prompt("What is your name ? "));
+        //socket.emit('usrname', prompt("What is your name ? "));
+        //prompt user if field is empty
+        do{
+            var name = prompt("What is your name ? ");
+        }while(name == '');
+        socket.emit('usrname', name);
+        // socket.emit('usrname', prompt("What is your name ? "));
         $( ".formUserChat" ). toggleClass( "hidden" );
         $( ".startchatpanel" ). toggleClass( "hidden" );
 
@@ -351,13 +383,15 @@ function searchNearbyAttarctions(position) {
 function processNearbyAttarctions(results, status) {
     if (status === google.maps.places.PlacesServiceStatus.OK) {
         for (var i = 0; i < results.length; i++) {
-            createMarker(results[i]);
+            //createMarker(results[i]);
+            makePanel(results[i]);
+            NearbyAttarctions[results[i].id]=results[i];
         }
     }
 }
 
 function createMarker(place) {
-    makePanel(place);
+    //makePanel(place);
     var placeLoc = place.geometry.location;
     var marker = new google.maps.Marker({
         map: map,
@@ -391,8 +425,13 @@ function makePanel(place) {
     newpanelbodycoldes.className="col-sm-6";
     newpanelbodycoldes.innerHTML='<p><strong>'+place.name+'</strong></br>'+place.name+'</p>';
 
+    var newpanelbodycolcheckbox = document.createElement("div");
+    newpanelbodycolcheckbox.className="col-sm-2";
+    newpanelbodycolcheckbox.innerHTML='<div class="checkbox checkbox-primary"><label><input type="checkbox" class="addselectedNearbyAttarction" value="'+place.id+'"></label></div>';
+
     newpanelbodyrow.appendChild(newpanelbodycolimage);
     newpanelbodyrow.appendChild(newpanelbodycoldes);
+    newpanelbodyrow.appendChild(newpanelbodycolcheckbox);
 
 
     newpanelbody.appendChild(newpanelbodyrow);
@@ -427,6 +466,8 @@ socket.on('usr', function (data) {
 socket.on('msg' ,function (usr, data) {
     //$('#messages').append(socket.username, " : "+data+"<br/>");
     $('#startingdescription').append(usr, " : "+data+"<br/>");
+    $("#startingdescription").scrollTop($("#startingdescription")[0].scrollHeight);
+
     var infoWindow = new google.maps.InfoWindow({map: map});
     infoWindow.setPosition(pos);
     infoWindow.setContent(data);
@@ -460,3 +501,10 @@ socket.on('get-user-location-request', function(data){
 socket.on('share-user-not-online', function(data){
     alert("user not active on site");
 });
+
+function addselectedNearbyAttarction(placeID) {
+    if(typeof autocomplete !== 'undefined'){
+        selectedNearbyAttarctions[placeID]=NearbyAttarctions[placeID];
+    }
+
+}

@@ -58,3 +58,6 @@ body { padding-top: 60px; }
 .well .list-group {
     margin-bottom: 0px;
 }
+.checkbox input[type="checkbox"].rememberme{
+    margin-left: 0;
+}

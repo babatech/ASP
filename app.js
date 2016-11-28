@@ -1,3 +1,17 @@
+console.log('baba start time:'+Date.now());
+var mysql = require('mysql');
+var settings = require('./config/config');
+var mysqlConn = mysql.createConnection(settings.Database);
+mysqlConn.connect(function(err){
+
+  if(!err) {
+    console.log('Database is connected!');
+
+  } else {
+    console.log('Error connecting database!'+err);
+  }
+});
+
 var express = require('express');
 var session = require('express-session');
 var socket_io = require('socket.io');
@@ -14,12 +28,11 @@ var passport = require('passport');
 var flash = require('connect-flash');
 outputarr = [];
 
-require('./config/passport')(passport); // pass passport for configuration
-var routes = require('./routes/index');
+require('./config/passport')(passport,mysqlConn); // pass passport for configuration
+var routes = require('./routes/index')(express,passport,mysqlConn);
 var users = require('./routes/users');
 
 var app = express();
-
 // socket.io
 var io = socket_io();
 app.io = io;
@@ -212,44 +225,44 @@ io.on('connection', function(socket){
  }
  });*/
 
-  function  getnearbyPlaces(position,type) {
-    outputarr = [];
-    googleMapsClient.placesNearby({
-      location: [position.lat, position.lng],
-      opennow: true,
-      radius: 3000,
-      type: 'museum'
-    }, function(err, response) {
-      if (!err) {
-        processnearbyplace(response.json.results);
-        io.emit('nearbyplaces', outputarr);
-      }
-    });
+function  getnearbyPlaces(position,type) {
+  outputarr = [];
+  googleMapsClient.placesNearby({
+    location: [position.lat, position.lng],
+    opennow: true,
+    radius: 3000,
+    type: 'museum'
+  }, function(err, response) {
+    if (!err) {
+      processnearbyplace(response.json.results);
+      io.emit('nearbyplaces', outputarr);
+    }
+  });
 
   //console.log(outputarr);
 }
 
 function processnearbyplace(result){
 
-    for (var i = 0; i < result.length; i++) {
-      var obj = result[i];
-      temp = {
-        id: sanitizer.escape(obj['id']),
-        place_id: sanitizer.escape(obj['place_id']),
-        title: sanitizer.escape(obj['name']),
-        geometry: sanitizer.escape(obj['geometry']['location']),
-        lat:sanitizer.escape(obj['geometry']['location']['lat']),
-        lan: sanitizer.escape(obj['geometry']['location']['lng']),
-        icon: sanitizer.escape(obj['icon'])
-      };
+  for (var i = 0; i < result.length; i++) {
+    var obj = result[i];
+    temp = {
+      id: sanitizer.escape(obj['id']),
+      place_id: sanitizer.escape(obj['place_id']),
+      title: sanitizer.escape(obj['name']),
+      geometry: sanitizer.escape(obj['geometry']['location']),
+      lat:sanitizer.escape(obj['geometry']['location']['lat']),
+      lan: sanitizer.escape(obj['geometry']['location']['lng']),
+      icon: sanitizer.escape(obj['icon'])
+    };
 
-      //console.log(temp);
-      outputarr.push(temp);
+    //console.log(temp);
+    outputarr.push(temp);
 
 
   }
 }
-  function setUserDataInSession(data) {
+function setUserDataInSession(data) {
 
-  }
-  module.exports = app;
+}
+module.exports = app;

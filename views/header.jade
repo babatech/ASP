@@ -14,14 +14,16 @@ div.navbar.navbar-inverse.navbar-fixed-top(role='navigation')
                 li
                     a(href="#{header.baseurl}/about") About
                 li
-                    a(href="#{header.baseurl}/contact") Contact
+                    a(href="#{header.baseurl}/chat") Chat
+                li
+                    a(href="#{header.baseurl}/sharelocation") Share Location
             ul.nav.navbar-nav.navbar-right
                 if  user.status == false
                     li.login-click.dropdown
                         a(href="#login",data-toggle="dropdown").dropdown-toggle login
                         div.dropdown-menu.dropdown-login
                             div.dropdown-header
-                                h4 Login
+
                             div.dropdown-body
                                 div.col-md-12
                                     form(name="userLoginForm",action="#{header.baseurl}/login",method="POST")#userLoginForm.userLoginForm
@@ -33,8 +35,9 @@ div.navbar.navbar-inverse.navbar-fixed-top(role='navigation')
                                             label Password
                                             input(type="password",name="password").form-control
                                         div.checkbox
+                                            input(type="checkbox",name="rememberme").rememberme
                                             label remember me
-                                                input(type="checkbox",name="rememberme")
+
                                         button.btn.btn-primary.btn-block(type="submit") login
                                         hr
                                         a.btn.btn-block.btn-login-facebook(href="#{header.baseurl}/loginfacebook") Login with Facebook
