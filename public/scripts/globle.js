@@ -247,7 +247,7 @@ $(document).ready(function(){
     });
     $( ".startchatbtn" ).click(function() {
         //socket.emit('usrname', prompt("What is your name ? "));
-
+        //prompt user if field is empty
         do{
             var name = prompt("What is your name ? ");
         }while(name == '');
