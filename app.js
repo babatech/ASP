@@ -249,7 +249,7 @@ function processnearbyplace(result){
 
   }
 }
-function setUserDataInSession(data) {
+  function setUserDataInSession(data) {
 
-}
-module.exports = app;
+  }
+  module.exports = app;
