@@ -47,7 +47,7 @@ function initMap() {
 
             map.setCenter(pos);
             map.setZoom(12);
-            //searchNearbyAttarctions(pos);
+            searchNearbyAttarctions(pos);
             socket.emit('user-position', pos);
         }, function() {
             handleLocationError(true, infoWindow, map.getCenter());
