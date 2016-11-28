@@ -35,6 +35,7 @@ var pos;
 var placeService;
 var geocoder;
 var autocomplete;
+var cityn;
 var positionTimer,usermarker,shareusermarker;
 
 
@@ -116,7 +117,7 @@ function  setUserPosition(position) {
     initMap();
     var latLng = new google.maps.LatLng(position.lat, position.lng);
     // Creating a marker and putting it on the map
-    usermarker = new google.maps.Marker({
+    var marker = new google.maps.Marker({
         position: latLng,
         map: map,
         title: "Your location",
@@ -126,7 +127,7 @@ function  setUserPosition(position) {
     geocodeLatLng(position);
     map.setCenter(position);
     map.setZoom(12);
-    addMarker(usermarker,"Your location");
+    addMarker(marker,"Your location");
     //searchNearbyAttarctions(pos);
     socket.emit('user-position', pos);
 }
@@ -171,7 +172,8 @@ function geocodeLatLng(position) {
     geocoder.geocode({'location': position}, function(results, status) {
         if (status === 'OK') {
             if (results[1]) {
-                setStartLocation(position,results[1].formatted_address,results[1])
+                setStartLocation(position,results[1].formatted_address,results[1]);
+                socket.emit("cityn", results[1].formatted_address);
             } else {
                 window.alert('No results found');
             }
@@ -406,7 +408,7 @@ function addPanel(newpanel) {
 }
 
 /*
-@todo: all
+@todo: all, areeb,waqar,shoaib,daniyal,shahab,mir
 add your frontend javascript here
  */
 

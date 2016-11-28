@@ -1,17 +1,3 @@
-console.log('baba start time:'+Date.now());
-var mysql = require('mysql');
-var settings = require('./config/config');
-var mysqlConn = mysql.createConnection(settings.Database);
-mysqlConn.connect(function(err){
-
-  if(!err) {
-    console.log('Database is connected!');
-
-  } else {
-    console.log('Error connecting database!'+err);
-  }
-});
-
 var express = require('express');
 var session = require('express-session');
 var socket_io = require('socket.io');
@@ -28,17 +14,19 @@ var passport = require('passport');
 var flash = require('connect-flash');
 outputarr = [];
 
-require('./config/passport')(passport,mysqlConn); // pass passport for configuration
-var routes = require('./routes/index')(express,passport,mysqlConn);
+require('./config/passport')(passport); // pass passport for configuration
+var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
+
 // socket.io
 var io = socket_io();
 app.io = io;
 
 var usernames={};
 var rooms = ['Kiel, Germany', 'Hamburg, Germany'];
+var cityn;
 
 // view engine setup
 
@@ -163,15 +151,33 @@ io.on('connection', function(socket){
   /*
   areeb sokcet
    */
+
+    socket.on("cityn", function (city) {
+        console.log(city);
+        cityn = city;
+    })
     socket.on('usrname', function (data) {
- //       socket.emit('usr', data);
+        //       socket.emit('usr', data);
         socket.username = data;
         usernames[data] = data;
-        socket.emit('usr', socket.username)
-        socket.room = 'room 1';
-        socket.join('room 1');
-        socket.emit('msg', 'you have connected to room 1');
-        socket.broadcast.to(socket.room).emit('msg', data + ' has connected to room 1')
+        socket.emit('usr', socket.username);
+        for (var i=0;i<=rooms.length;i++){
+          if (cityn.indexOf(rooms[i]) >=0){
+            console.log("city found");
+            socket.room = cityn;
+            socket.join(cityn);
+            socket.emit('msg', 'you have connected to '+cityn);
+            socket.broadcast.to(socket.room).emit('msg', data + ' has connected to '+cityn);
+            break;
+          }else{
+            //if city not found
+            socket.room = cityn;
+            socket.join(cityn);
+            socket.emit('msg', 'you have connected to '+cityn);
+            socket.broadcast.to(socket.room).emit('msg', data + ' has connected to '+cityn);
+          }
+        }
+
     });
     socket.on('chatmessage', function (data) {
         io.sockets.in(socket.room).emit('msg',socket.username, data);
