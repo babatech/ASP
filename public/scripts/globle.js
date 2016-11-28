@@ -19,12 +19,12 @@ $('.btn-login-facebook').bind('click', function() {
  });*/
 
 // handle a session response from any of the auth related calls
- function handleSessionResponse() {
-     FB.api('/me', function(response) {
-         console.log(response);
-         $('#user-info').html(response.id + ' - ' + response.name);
-     });
- }
+function handleSessionResponse() {
+    FB.api('/me', function(response) {
+        console.log(response);
+        $('#user-info').html(response.id + ' - ' + response.name);
+    });
+}
 
 
 
@@ -131,7 +131,7 @@ function  setUserPosition(position) {
     map.setCenter(position);
     map.setZoom(12);
     addMarker(marker,"Your location");
-    //searchNearbyAttarctions(pos);
+    searchNearbyAttarctions(pos);
     socket.emit('user-position', pos);
 }
 
@@ -197,298 +197,298 @@ function toggleMapPlanPanle() {
 }
 
 /*
-areeb cityname start
+ areeb cityname start
  */
 
 
 /*
-areeb cityname code end
+ areeb cityname code end
  */
 
-        $(document).ready(function(){
-            initMap();
-            var lastSend = 0;
-            // local-login
-            $("#send-message").submit(function(event) {
-                if(pos==null) return false;
+$(document).ready(function(){
+    initMap();
+    var lastSend = 0;
+    // local-login
+    $("#send-message").submit(function(event) {
+        if(pos==null) return false;
 
-                event.preventDefault();
-            });
-            $( ".toggle-map-plan-panel" ).click(function() {
-                toggleMapPlanPanle()
-            });
-            $( ".get-current-location" ).click(function() {
-                getbrowserGeolocation();
-            });
-            /*
-             @todo:waqar
-             this the function for submiting user input for email and user location
-             and see app.js file for server side function for handling the user submission
-             */
-            $("#shareLocationForm").submit(function(event) {
-                //return false;
-                if($(".shareLocationEmail").val()!=null ){
+        event.preventDefault();
+    });
+    $( ".toggle-map-plan-panel" ).click(function() {
+        toggleMapPlanPanle()
+    });
+    $( ".get-current-location" ).click(function() {
+        getbrowserGeolocation();
+    });
+    /*
+     @todo:waqar
+     this the function for submiting user input for email and user location
+     and see app.js file for server side function for handling the user submission
+     */
+    $("#shareLocationForm").submit(function(event) {
+        //return false;
+        if($(".shareLocationEmail").val()!=null ){
 
-                    watchCurrentPosition();
+            watchCurrentPosition();
 
-                    var shareLocation = {
-                        pos: pos,
-                        email: $(".shareLocationEmail").val()
-                    };
-                    socket.emit('user-share-location', shareLocation);
-                    //$( ".map-share-panel" ). toggleClass( "hidden" );
-                    $( ".share-location-buddy" ). toggleClass( "hidden" );
-                }
-
-
-                event.preventDefault();
-            });
-            function watchCurrentPosition() {
-                positionTimer = navigator.geolocation.watchPosition(function(position) {
-                    pos = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
-                    if (typeof usermarker === 'undefined'){
-                        usermarker = new google.maps.Marker({
-                            position: new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
-                            map: map,
-                            title: "Your location",
-                            icon: "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"
-                        });
-                        addMarker(usermarker,"your location");
-                        setUserPosition(pos);
-                        console.log("check watch");
-                    }
+            var shareLocation = {
+                pos: pos,
+                email: $(".shareLocationEmail").val()
+            };
+            socket.emit('user-share-location', shareLocation);
+            //$( ".map-share-panel" ). toggleClass( "hidden" );
+            $( ".share-location-buddy" ). toggleClass( "hidden" );
+        }
 
 
-                    setMarkerPosition(usermarker, position);
-                    socket.emit('update-user-position', position);
-                });
-            }
-
-
-
-            /*
-             areeb ready function area start
-             */
-            $('.chatInCityForm').submit(function(){
-                socket.emit('chatmessage', $('#m').val());
-                $('#m').val('');
-                return false;
-            });
-            $( ".startchatbtn" ).click(function() {
-                //socket.emit('usrname', prompt("What is your name ? "));
-                //prompt user if field is empty
-                do{
-                    var name = prompt("What is your name ? ");
-                }while(name == '');
-                socket.emit('usrname', name);
-                // socket.emit('usrname', prompt("What is your name ? "));
-                $( ".formUserChat" ). toggleClass( "hidden" );
-                $( ".startchatpanel" ). toggleClass( "hidden" );
-
-            });
-
-            /*
-             areeb ready function area end
-             */
-
-            /*window.setInterval(function(){
-             /// call your function here
-             RefershUSERGeolocation();
-             }, 2000);*/
-
-
-        });
-
-        socket.on('nearbyplaces', function(data){
-
-            for (var i = 0; i < data.length; i++) {
-
-                var place = data[i];
-                var latLng = new google.maps.LatLng(place.lat, place.lng);
-                // Creating a marker and putting it on the map
-                var marker = new google.maps.Marker({
-                    position: latLng,
+        event.preventDefault();
+    });
+    function watchCurrentPosition() {
+        positionTimer = navigator.geolocation.watchPosition(function(position) {
+            pos = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            };
+            if (typeof usermarker === 'undefined'){
+                usermarker = new google.maps.Marker({
+                    position: new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
                     map: map,
-                    title: place.title,
-                    icon: place.icon
+                    title: "Your location",
+                    icon: "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"
                 });
+                addMarker(usermarker,"your location");
+                setUserPosition(pos);
+                console.log("check watch");
             }
 
+
+            setMarkerPosition(usermarker, position);
+            socket.emit('update-user-position', position);
         });
-        socket.on('data', function(data){
-            var infoWindow = new google.maps.InfoWindow({map: map});
-            var position = data.pos;
-            var message = data.message;
+    }
 
-            message = message.replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, "<a target='_blank' href='$1'>$1</a>");
-
-            infoWindow.setPosition(position);
-            infoWindow.setContent(message);
-
-            setTimeout(function(){
-                infoWindow.close();
-            }, 5000);
-        });
-        function searchNearbyAttarctions(position) {
-            var latLng = new google.maps.LatLng(position.lat, position.lng);
-            placeService.nearbySearch({
-                location: latLng,
-                radius: 2000,
-                type: ['night_club']
-            }, processNearbyAttarctions);
-            placeService.nearbySearch({
-                location: latLng,
-                radius: 2000,
-                type: ['museum']
-            }, processNearbyAttarctions);
-            placeService.nearbySearch({
-                location: latLng,
-                radius: 2000,
-                type: ['zoo']
-            }, processNearbyAttarctions);
-            placeService.nearbySearch({
-                location: latLng,
-                radius: 2000,
-                type: ['aquarium']
-            }, processNearbyAttarctions);
-            placeService.nearbySearch({
-                location: latLng,
-                radius: 2000,
-                type: ['amusement_park']
-            }, processNearbyAttarctions);
-            placeService.nearbySearch({
-                location: latLng,
-                radius: 2000,
-                type: ['art_gallery']
-            }, processNearbyAttarctions);
-
-        }
-
-        function processNearbyAttarctions(results, status) {
-            if (status === google.maps.places.PlacesServiceStatus.OK) {
-                for (var i = 0; i < results.length; i++) {
-                    createMarker(results[i]);
-                }
-            }
-        }
-
-        function createMarker(place) {
-            makePanel(place);
-            var placeLoc = place.geometry.location;
-            var marker = new google.maps.Marker({
-                map: map,
-                position: place.geometry.location/*,
-                 icon:place.icon*/
-            });
-
-            google.maps.event.addListener(marker, 'click', function() {
-                infowindow.setContent(place.name);
-                infowindow.open(map, this);
-            });
-        }
-
-        function makePanel(place) {
-            //console.log(place);
-            var newpanel = document.createElement("div");
-            newpanel.className="panel panel-default";
-            newpanel.id=place.id;
-
-            var newpanelbody = document.createElement("div");
-            newpanelbody.className="panel-body";
-
-            var newpanelbodyrow = document.createElement("div");
-            newpanelbodyrow.className="row";
-
-            var newpanelbodycolimage = document.createElement("div");
-            newpanelbodycolimage.className="col-sm-4";
-            newpanelbodycolimage.innerHTML='<img class="img-responsive" src="'+place.icon+'" alt="'+place.name+'" />';
-
-            var newpanelbodycoldes = document.createElement("div");
-            newpanelbodycoldes.className="col-sm-6";
-            newpanelbodycoldes.innerHTML='<p><strong>'+place.name+'</strong></br>'+place.name+'</p>';
-
-            newpanelbodyrow.appendChild(newpanelbodycolimage);
-            newpanelbodyrow.appendChild(newpanelbodycoldes);
-
-
-            newpanelbody.appendChild(newpanelbodyrow);
-            newpanel.appendChild(newpanelbody);
-
-            addPanel(newpanel);
-
-        }
-
-        function addPanel(newpanel) {
-            $(newpanel).insertAfter(".add-after-panel");
-        }
-
-        /*
-         @todo: all, areeb,waqar,shoaib,daniyal,shahab,mir
-         add your frontend javascript here
-         */
-
-        /*
-         areeb js function area start
-         */
-
-
-
-
-
-
-        socket.on('connect', function () {
-            // socket.emit('usrname', prompt("What is your name ? "));
-
-        });
-
-        socket.on('usr', function (data) {
-            socket.username = data;
-        });
-
-        socket.on('msg' ,function (usr, data) {
-            //$('#messages').append(socket.username, " : "+data+"<br/>");
-            $('#startingdescription').append(usr, " : "+data+"<br/>");
-            $("#startingdescription").scrollTop($("#startingdescription")[0].scrollHeight);
-
-            var infoWindow = new google.maps.InfoWindow({map: map});
-            infoWindow.setPosition(pos);
-            infoWindow.setContent(data);
-            setTimeout(function(){infoWindow.close();}, '5000');
-
-        });
 
 
     /*
-     areeb js function area end
+     areeb ready function area start
+     */
+    $('.chatInCityForm').submit(function(){
+        socket.emit('chatmessage', $('#m').val());
+        $('#m').val('');
+        return false;
+    });
+    $( ".startchatbtn" ).click(function() {
+        //socket.emit('usrname', prompt("What is your name ? "));
+        //prompt user if field is empty
+        do{
+            var name = prompt("What is your name ? ");
+        }while(name == '');
+        socket.emit('usrname', name);
+        // socket.emit('usrname', prompt("What is your name ? "));
+        $( ".formUserChat" ). toggleClass( "hidden" );
+        $( ".startchatpanel" ). toggleClass( "hidden" );
+
+    });
+
+    /*
+     areeb ready function area end
      */
 
-    function setMarkerPosition(marker, position) {
-        marker.setPosition(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
-        console.log(position);
-    }
-    socket.on('share-user-request-accepted', function(data){
-        usermarker = new google.maps.Marker({
-            position: new google.maps.LatLng(data.coords.latitude, data.coords.longitude),
+    /*window.setInterval(function(){
+     /// call your function here
+     RefershUSERGeolocation();
+     }, 2000);*/
+
+
+});
+
+socket.on('nearbyplaces', function(data){
+
+    for (var i = 0; i < data.length; i++) {
+
+        var place = data[i];
+        var latLng = new google.maps.LatLng(place.lat, place.lng);
+        // Creating a marker and putting it on the map
+        var marker = new google.maps.Marker({
+            position: latLng,
             map: map,
-            title: "other user location"
+            title: place.title,
+            icon: place.icon
         });
-        addMarker(shareusermarker,"other user location");
-    });
-    socket.on('receive-share-user-position', function(data){
-        setMarkerPosition(shareusermarker, data);
+    }
+
+});
+socket.on('data', function(data){
+    var infoWindow = new google.maps.InfoWindow({map: map});
+    var position = data.pos;
+    var message = data.message;
+
+    message = message.replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, "<a target='_blank' href='$1'>$1</a>");
+
+    infoWindow.setPosition(position);
+    infoWindow.setContent(message);
+
+    setTimeout(function(){
+        infoWindow.close();
+    }, 5000);
+});
+function searchNearbyAttarctions(position) {
+    var latLng = new google.maps.LatLng(position.lat, position.lng);
+    placeService.nearbySearch({
+        location: latLng,
+        radius: 2000,
+        type: ['night_club']
+    }, processNearbyAttarctions);
+    placeService.nearbySearch({
+        location: latLng,
+        radius: 2000,
+        type: ['museum']
+    }, processNearbyAttarctions);
+    placeService.nearbySearch({
+        location: latLng,
+        radius: 2000,
+        type: ['zoo']
+    }, processNearbyAttarctions);
+    placeService.nearbySearch({
+        location: latLng,
+        radius: 2000,
+        type: ['aquarium']
+    }, processNearbyAttarctions);
+    placeService.nearbySearch({
+        location: latLng,
+        radius: 2000,
+        type: ['amusement_park']
+    }, processNearbyAttarctions);
+    placeService.nearbySearch({
+        location: latLng,
+        radius: 2000,
+        type: ['art_gallery']
+    }, processNearbyAttarctions);
+
+}
+
+function processNearbyAttarctions(results, status) {
+    if (status === google.maps.places.PlacesServiceStatus.OK) {
+        for (var i = 0; i < results.length; i++) {
+            createMarker(results[i]);
+        }
+    }
+}
+
+function createMarker(place) {
+    makePanel(place);
+    var placeLoc = place.geometry.location;
+    var marker = new google.maps.Marker({
+        map: map,
+        position: place.geometry.location/*,
+         icon:place.icon*/
     });
 
-    socket.on('get-user-location-request', function(data){
-        // code for user share location request
-        // if user accept request then redirect it to user http://localhost:300/sharelocation
-        // else send server that user didnot want to share location with requested user
+    google.maps.event.addListener(marker, 'click', function() {
+        infowindow.setContent(place.name);
+        infowindow.open(map, this);
     });
-    socket.on('share-user-not-online', function(data){
-        alert("user not active on site");
+}
+
+function makePanel(place) {
+    //console.log(place);
+    var newpanel = document.createElement("div");
+    newpanel.className="panel panel-default";
+    newpanel.id=place.id;
+
+    var newpanelbody = document.createElement("div");
+    newpanelbody.className="panel-body";
+
+    var newpanelbodyrow = document.createElement("div");
+    newpanelbodyrow.className="row";
+
+    var newpanelbodycolimage = document.createElement("div");
+    newpanelbodycolimage.className="col-sm-4";
+    newpanelbodycolimage.innerHTML='<img class="img-responsive" src="'+place.icon+'" alt="'+place.name+'" />';
+
+    var newpanelbodycoldes = document.createElement("div");
+    newpanelbodycoldes.className="col-sm-6";
+    newpanelbodycoldes.innerHTML='<p><strong>'+place.name+'</strong></br>'+place.name+'</p>';
+
+    newpanelbodyrow.appendChild(newpanelbodycolimage);
+    newpanelbodyrow.appendChild(newpanelbodycoldes);
+
+
+    newpanelbody.appendChild(newpanelbodyrow);
+    newpanel.appendChild(newpanelbody);
+
+    addPanel(newpanel);
+
+}
+
+function addPanel(newpanel) {
+    $(newpanel).insertAfter(".add-after-panel");
+}
+
+/*
+ @todo: all, areeb,waqar,shoaib,daniyal,shahab,mir
+ add your frontend javascript here
+ */
+
+/*
+ areeb js function area start
+ */
+
+
+
+
+
+
+socket.on('connect', function () {
+    // socket.emit('usrname', prompt("What is your name ? "));
+
+});
+
+socket.on('usr', function (data) {
+    socket.username = data;
+});
+
+socket.on('msg' ,function (usr, data) {
+    //$('#messages').append(socket.username, " : "+data+"<br/>");
+    $('#startingdescription').append(usr, " : "+data+"<br/>");
+    $("#startingdescription").scrollTop($("#startingdescription")[0].scrollHeight);
+
+    var infoWindow = new google.maps.InfoWindow({map: map});
+    infoWindow.setPosition(pos);
+    infoWindow.setContent(data);
+    setTimeout(function(){infoWindow.close();}, '5000');
+
+});
+
+
+/*
+ areeb js function area end
+ */
+
+function setMarkerPosition(marker, position) {
+    marker.setPosition(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+    console.log(position);
+}
+socket.on('share-user-request-accepted', function(data){
+    usermarker = new google.maps.Marker({
+        position: new google.maps.LatLng(data.coords.latitude, data.coords.longitude),
+        map: map,
+        title: "other user location"
     });
+    addMarker(shareusermarker,"other user location");
+});
+socket.on('receive-share-user-position', function(data){
+    setMarkerPosition(shareusermarker, data);
+});
+
+socket.on('get-user-location-request', function(data){
+    // code for user share location request
+    // if user accept request then redirect it to user http://localhost:300/sharelocation
+    // else send server that user didnot want to share location with requested user
+});
+socket.on('share-user-not-online', function(data){
+    alert("user not active on site");
+});
 
 
 /* Changes committed */
