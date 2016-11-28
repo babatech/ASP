@@ -217,22 +217,10 @@ $(document).ready(function(){
         var placeID= $( this ).val();
             addselectedNearbyAttarction(placeID);
             createMarker(selectedNearbyAttarctions[placeID]);
-            console.log(placeID);
+            //console.log(placeID);
         }
     });
-    $(".checkbox").change(function() {
-        if(this.checked) {
-            addselectedNearbyAttarction(placeID);
-            createMarker(selectedNearbyAttarctions[placeID]);
-            console.log(placeID);
-        }
-    });
-    $( ".addselectedNearbyAttarction" ).click(function() {
 
-        addselectedNearbyAttarction(placeID);
-        createMarker(selectedNearbyAttarctions[placeID]);
-        console.log(placeID);
-    });
     /*
     @todo:waqar
     this the function for submiting user input for email and user location
@@ -291,6 +279,7 @@ areeb ready function area start
         return false;
     });
     $( ".startchatbtn" ).click(function() {
+        getbrowserGeolocation();
         //socket.emit('usrname', prompt("What is your name ? "));
         //prompt user if field is empty
         do{
