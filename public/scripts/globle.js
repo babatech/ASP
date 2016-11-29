@@ -225,6 +225,8 @@ $(document).ready(function(){
     @todo:waqar
     this the function for submiting user input for email and user location
     and see app.js file for server side function for handling the user submission
+    user-share-location -> request for sharing location plus own location
+    update-user-position
      */
     $("#shareLocationForm").submit(function(event) {
         //return false;
@@ -245,11 +247,13 @@ $(document).ready(function(){
         event.preventDefault();
     });
     function watchCurrentPosition() {
+        // https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/watchPosition
         positionTimer = navigator.geolocation.watchPosition(function(position) {
             pos = {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
             };
+            // Add marker if not already done
             if (typeof usermarker === 'undefined'){
                 usermarker = new google.maps.Marker({
                     position: new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
@@ -261,7 +265,6 @@ $(document).ready(function(){
                 setUserPosition(pos);
                 console.log("check watch");
             }
-
 
             setMarkerPosition(usermarker, position);
             socket.emit('update-user-position', position);

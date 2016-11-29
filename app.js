@@ -139,13 +139,13 @@ io.on('connection', function(socket){
     console.log('user disconnected');
   });
   /*
-   @todo waqar
+   @todo:waqar
    this the function where share location form submission is handled
    */
   socket.on('user-share-location', function(data){
 
     // search for spacific user in active user list on site
-    // if user exit then this emait
+    // if user exit then this emit
 
     io.emit('get-user-location-request', data);
     // else send back user a massge that user not exist
