@@ -195,7 +195,7 @@ function toggleMapPlanPanle() {
 
 }
 
-$(document).ready(function(){
+$(document).ready(function(){ // @TODO: Waqar Read the purpose of this function
     initMap();
     var lastSend = 0;
     // local-login
@@ -225,14 +225,34 @@ $(document).ready(function(){
     @todo:waqar
     this the function for submiting user input for email and user location
     and see app.js file for server side function for handling the user submission
-    user-share-location -> request for sharing location plus own location
-    update-user-position
+
+    Message headers:
+    @TODO:Waqar Gave these messages more meaningful names, standardise nomenclature
+    @TODO Waqar State Machine would make sense here, A state checker on every IN message to, try reducing messages
+
+    Waiting--> Request_Sent --> Sharing_Location
+       <------------|   <--------------|
+
+        MSG                             DIRECTION                       DESCRIPTION
+
+    user-share-location                    OUT              Request for sharing location plus own location
+
+    update-user-position                   OUT              Message containing user new location, this will be sent periodically
+
+    share-user-request-accepted            IN
+
+    receive-share-user-position            IN
+
+    get-user-location-request              IN
+
+    share-user-not-online                  IN
+
      */
     $("#shareLocationForm").submit(function(event) {
         //return false;
-        if($(".shareLocationEmail").val()!=null ){
+        if($(".shareLocationEmail").val()!=null ){ // email security check already done, I guess
 
-            watchCurrentPosition();
+            watchCurrentPosition(); // CHECK: if its ok to share location before reaching an agreement between two parties
 
             var shareLocation = {
                 pos: pos,
@@ -246,8 +266,37 @@ $(document).ready(function(){
 
         event.preventDefault();
     });
+
+
+    socket.on('share-user-request-accepted', function(data){
+        usermarker = new google.maps.Marker({
+            position: new google.maps.LatLng(data.coords.latitude, data.coords.longitude),
+            map: map,
+            title: "other user location"
+        });
+        addMarker(shareusermarker,"other user location");
+    });
+    socket.on('receive-share-user-position', function(data){
+        setMarkerPosition(shareusermarker, data);
+    });
+
+    socket.on('get-user-location-request', function(data){
+        // code for user share location request
+        // if user accept request then redirect it to user http://localhost:300/sharelocation
+        // else send server that user didnot want to share location with requested user
+    });
+    socket.on('share-user-not-online', function(data){
+        alert("user not active on site");
+    });
+
     function watchCurrentPosition() {
-        // https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/watchPosition
+        /*
+        Updates pos variable as position is changed
+        Enable sending Periodic position updates
+        Sources:
+        https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/watchPosition
+        @TODO: Waqar update-user-position http://www.w3schools.com/js/js_timing.asp
+        */
         positionTimer = navigator.geolocation.watchPosition(function(position) {
             pos = {
                 lat: position.coords.latitude,
@@ -446,6 +495,7 @@ add your frontend javascript here
 /*
 areeb js function area start
  */
+
 socket.on('connect', function () {
    // socket.emit('usrname', prompt("What is your name ? "));
 
@@ -465,7 +515,6 @@ socket.on('msg' ,function (usr, data) {
     infoWindow.setContent(data);
     setTimeout(function(){infoWindow.close();}, '5000');
 });
-
 /*
 areeb js function area end
  */
@@ -473,26 +522,6 @@ function setMarkerPosition(marker, position) {
     marker.setPosition(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
     console.log(position);
 }
-socket.on('share-user-request-accepted', function(data){
-    usermarker = new google.maps.Marker({
-        position: new google.maps.LatLng(data.coords.latitude, data.coords.longitude),
-        map: map,
-        title: "other user location"
-    });
-    addMarker(shareusermarker,"other user location");
-});
-socket.on('receive-share-user-position', function(data){
-    setMarkerPosition(shareusermarker, data);
-});
-
-socket.on('get-user-location-request', function(data){
-    // code for user share location request
-    // if user accept request then redirect it to user http://localhost:300/sharelocation
-    // else send server that user didnot want to share location with requested user
-});
-socket.on('share-user-not-online', function(data){
-    alert("user not active on site");
-});
 
 function addselectedNearbyAttarction(placeID) {
     if(typeof autocomplete !== 'undefined'){

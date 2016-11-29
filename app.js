@@ -141,10 +141,12 @@ io.on('connection', function(socket){
   /*
    @todo:waqar
    this the function where share location form submission is handled
+   Clear the issue of pipe between users, probably: everyuser update server about himself, every user request server about other
+   server take care of permissions and privileges of users, if so clarify where to change these permissions, talk with responsible person
    */
   socket.on('user-share-location', function(data){
 
-    // search for spacific user in active user list on site
+    // search for specific user in active user list on site
     // if user exit then this emit
 
     io.emit('get-user-location-request', data);
@@ -154,13 +156,11 @@ io.on('connection', function(socket){
 
   });
   socket.on('update-user-position', function(data){
-
-
-
-
+    //Code for handling location updates from user
     io.emit('receive-share-user-position', data);
 
   });
+
   /*
   areeb sokcet
    */
