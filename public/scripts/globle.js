@@ -214,7 +214,7 @@ $(document).ready(function(){
         event.preventDefault();
     });
     $( ".toggle-map-plan-panel" ).click(function() {
-        $( ".map-plan-panel" ). toggleClass( "toggled-poi" );
+        $( ".map-plan-panel-pp" ). toggleClass( "toggled-poi" );
         $( ".make-route" ). toggleClass( "hidden" );
         $( ".map-city-panel" ). toggleClass( "hidden" );
         initMap();
