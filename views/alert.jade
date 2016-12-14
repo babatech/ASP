@@ -1,0 +1,21 @@
+div.container
+  if messages.errormessage
+      div.alert.alert-dismissible.alert-danger(role="alert")
+        button.close(type="button",data-dismiss="alert" ,aria-label="Close")
+          span(aria-hidden="true") &times;
+        p #{messages.errormessage}
+  if messages.successmessage
+      div.alert.alert-dismissible.alert-success(role="alert")
+        button.close(type="button",data-dismiss="alert" ,aria-label="Close")
+          span(aria-hidden="true") &times;
+        p #{messages.successmessage}
+  if messages.warningmessage
+      div.alert.alert-dismissible.alert-warning(role="alert")
+        button.close(type="button",data-dismiss="alert" ,aria-label="Close")
+          span(aria-hidden="true") &times;
+        p #{messages.errormessage}
+  if messages.infomessage
+      div.alert.alert-dismissible.alert-info(role="alert")
+        button.close(type="button",data-dismiss="alert" ,aria-label="Close")
+          span(aria-hidden="true") &times;
+        p #{messages.infomessage}

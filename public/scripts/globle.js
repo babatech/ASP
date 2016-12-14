@@ -38,7 +38,8 @@ var autocomplete;
 var cityn;
 var positionTimer,usermarker,shareusermarker;
 var NearbyAttarctions={};
-var selectedNearbyAttarctions={};
+var selectedNearbyAttarctions=[];
+var  infoWindows=[];
 
 
 function initMap() {
@@ -46,7 +47,7 @@ function initMap() {
     if (typeof mapelemtn !== 'undefined'){
         //alert();
     }
-    if(typeof map === 'undefined' && typeof mapelemtn !== 'undefined' ){
+    if(typeof map === 'undefined' && $("#map").is(':visible') ){
 
         map = new google.maps.Map(mapelemtn, {
             zoom: 2,
@@ -204,20 +205,35 @@ $(document).ready(function(){
 
         event.preventDefault();
     });
+    $(".make-route").click(function(event) {
+        if(selectedNearbyAttarctions === undefined || Object.keys(selectedNearbyAttarctions).length === 0){
+            alert("Please select point of attraction first. ");
+            return false;
+        }
+        drawPOIRoute();
+        event.preventDefault();
+    });
     $( ".toggle-map-plan-panel" ).click(function() {
-        $( ".map-plan-panel" ). toggleClass( "hidden" );
+        $( ".map-plan-panel" ). toggleClass( "toggled-poi" );
+        $( ".make-route" ). toggleClass( "hidden" );
         $( ".map-city-panel" ). toggleClass( "hidden" );
+        initMap();
     });
     $( ".get-current-location" ).click(function() {
         getbrowserGeolocation();
     });
     $(document).on('change', '.addselectedNearbyAttarction[type=checkbox]', function() {
-
-        if($( this ).is(":checked")) {
         var placeID= $( this ).val();
+        if($( this ).is(":checked")) {
+
             addselectedNearbyAttarction(placeID);
             createMarker(selectedNearbyAttarctions[placeID]);
             //console.log(placeID);
+        }else{
+
+            selectedNearbyAttarctions[placeID]["markerref"].setMap(null);
+            removeselectedNearbyAttarction(placeID);
+            //createMarker(selectedNearbyAttarctions[placeID]);
         }
     });
 
@@ -387,11 +403,13 @@ function createMarker(place) {
         position: place.geometry.location/*,
          icon:place.icon*/
     });
-
+    infoWindows[place.id] = new google.maps.InfoWindow({map: map});
     google.maps.event.addListener(marker, 'click', function() {
-        infowindow.setContent(place.name);
-        infowindow.open(map, this);
+        infoWindows[place.id].setContent(place.name);
+        infoWindows[place.id].open(map, this);
     });
+    selectedNearbyAttarctions[place.id]["markerref"] = marker;
+    selectedNearbyAttarctions[place.id]["markerinfo"] = infoWindows[place.id];
 }
 
 function makePanel(place) {
@@ -490,10 +508,67 @@ socket.on('get-user-location-request', function(data){
 socket.on('share-user-not-online', function(data){
     alert("user not active on site");
 });
-
+var lastselectionmarker=null;
 function addselectedNearbyAttarction(placeID) {
     if(typeof autocomplete !== 'undefined'){
         selectedNearbyAttarctions[placeID]=NearbyAttarctions[placeID];
+        lastselectionmarker=NearbyAttarctions[placeID];
     }
+
+}
+function removeselectedNearbyAttarction(placeID) {
+    delete  selectedNearbyAttarctions[placeID];
+}
+function drawPOIRoute() {
+    if(selectedNearbyAttarctions === undefined || Object.keys(selectedNearbyAttarctions).length === 0){
+        alert("Please select point of attraction first.");
+        return false;
+    }
+    // Instantiate a directions service.
+    var directionsService = new google.maps.DirectionsService;
+// Create a renderer for directions and bind it to the map.
+    var directionsDisplay = new google.maps.DirectionsRenderer({map: map});
+
+    // Instantiate an info window to hold step text.
+    var stepDisplay = new google.maps.InfoWindow;
+    var waypts = [];
+// First, remove any existing markers from the map.
+    for (poikey in selectedNearbyAttarctions) {
+        selectedNearbyAttarctions[poikey]["markerref"].setMap(null);
+        waypts.push({
+            location: selectedNearbyAttarctions[poikey].geometry.location,
+            stopover: true
+        });
+
+    }
+
+    directionsService.route({
+        origin: new google.maps.LatLng(pos.lat, pos.lng),
+        destination: lastselectionmarker.geometry.location,
+        waypoints: waypts,
+        optimizeWaypoints: true,
+        travelMode: 'DRIVING'
+    }, function(response, status) {
+        if (status === 'OK') {
+            directionsDisplay.setDirections(response);
+            var route = response.routes[0];
+            console.log(route);
+            var summaryPanel = document.getElementById('directions-panel');
+            summaryPanel.innerHTML = '<div class="jumbotron">';
+            // For each route, display summary information.
+            for (var i = 0; i < route.legs.length; i++) {
+                var routeSegment = i + 1;
+                summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment +
+                    '</b><br>';
+                summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
+                summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
+                summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
+            }
+            summaryPanel.innerHTML += "</div>";
+        } else {
+            window.alert('Directions request failed due to ' + status);
+        }
+    });
+
 
 }

@@ -3,9 +3,9 @@ var mysql = require('mysql');
 var settings = require('./config');
 var db;
 var exports = {};
-exports.connectdb = function () {
+//exports.connectdb = function () {
     // if (!db){
-        db = mysql.createConnection(settings.Database);
+        db = mysql.createConnection(settings.onlineDatabase);
 
         db.connect(function(err){
 
@@ -18,6 +18,6 @@ exports.connectdb = function () {
             }
         });
     // }
-}
+//}
 
-module.exports = exports;
+module.exports = db;

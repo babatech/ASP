@@ -32,7 +32,10 @@ module.exports = function( express,passport,databaseConnection ) {
     /* GET about page. */
     router.get('/about', function(req, res, next) {
         header["title"] = 'About Us';
+        req.flash("errormessage", "test message");
 
+
+        console.log(res.locals.messages);
         //console.log(req.session);
         res.render('about', { header: header,user: user,title: 'About us'  });
     });
@@ -84,6 +87,10 @@ module.exports = function( express,passport,databaseConnection ) {
 
     router.get('/logout', function(req, res) {
         req.logout();
+        user['name'] = "John Snow";
+        user['avatar'] = "image link";
+        user['status'] = false;
+        user['loginStatus'] = false;
         res.redirect('/');
     });
     /*
@@ -109,6 +116,6 @@ module.exports = function( express,passport,databaseConnection ) {
         header["title"] = 'Share location with your buddy';
         res.render('sharelocation', { header: header,user: user,title: 'Sh'  });
     });
-    console.log('baba rout export:'+Date.now());
+    //console.log('baba rout export:'+Date.now());
     return router;
 };

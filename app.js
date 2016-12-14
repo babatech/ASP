@@ -1,16 +1,7 @@
 console.log('baba start time:'+Date.now());
 var mysql = require('mysql');
 var settings = require('./config/config');
-var mysqlConn = mysql.createConnection(settings.Database);
-mysqlConn.connect(function(err){
-
-  if(!err) {
-    console.log('Database is connected!');
-
-  } else {
-    console.log('Error connecting database!'+err);
-  }
-});
+var mysqlConn = require('./config/db');
 
 var express = require('express');
 var session = require('express-session');
@@ -62,7 +53,10 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
-
+app.use(function(req, res, next) {
+  res.locals.messages = req.flash();
+  next();
+});
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);

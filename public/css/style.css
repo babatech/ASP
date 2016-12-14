@@ -61,3 +61,7 @@ body { padding-top: 60px; }
 .checkbox input[type="checkbox"].rememberme{
     margin-left: 0;
 }
+.btn-login-facebook{
+    background: #3B5998;
+    color: #ffffff;
+}

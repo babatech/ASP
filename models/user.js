@@ -4,13 +4,13 @@ module.exports =  function(databaseConnection) {
         login: function(email,password) {
 
             var userdetails = { name:email, password:password};
-            if ( databaseConnection == null ) console.log('still nul');
-            else console.log('not nul');
+            //if ( databaseConnection == null ) console.log('still nul');
+            //else console.log('not nul');
 
             databaseConnection.query("SELECT * FROM users where email = '"+email+"' and password = '"+password +"'", function (err, result) {
                 if(err)
                 {
-                    console.log(result[0]+' err');
+                    console.log('err:'+err);
                     return null;
                 }
                 else {
@@ -21,7 +21,7 @@ module.exports =  function(databaseConnection) {
                 // console.log('The solution is: ', result); // object difference result is same
             });
         },
-        fblogin: function(email,profileid) {
+        fblogin: function(email,profileid,name) {
             //var userdetails = { name:email, password:profileid};
             databaseConnection.query("SELECT * FROM users where email = '"+email+"' and password = '"+profileid +"'", function (err, result) {
                 if(err)
@@ -33,7 +33,7 @@ module.exports =  function(databaseConnection) {
                 else {
                     //console.log(result[0] + ' ress' );
                     if (typeof result[0] === "undefined" ){
-                        var userdetails = { name:email, password:profileid};
+                        var userdetails = { name:name,email:email, password:profileid};
                         databaseConnection.query('INSERT INTO users  SET ?', userdetails, function(err,res){
                             if(err)
                             {console.log('err in insert fb');

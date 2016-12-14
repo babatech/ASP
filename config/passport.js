@@ -50,18 +50,21 @@ module.exports = function(passport,databaseConnection) {
                 var result = usermodule.login(email,password);
                 if(result === true )
                 {
+                    req.flash("successmessage", "Welcome ");
                     console.log('usercraeted');
                     user["email"]=email;
                     user["status"]=true;
-                    user["name"]="John Snow";
+                    user["name"]=email;
                     user["avatar"]="";
                     user["loginStatus"]=true;
                     return done(null, user);
                 }else{
+                    req.flash("errormessage", "Invalide email or password!");
                     user["msg"]="User not exists";
                     console.log('error ');
                 }
             }else{
+                req.flash("errormessage", "Invalide email!");
                 user["msg"]="invalide email";
                 console.log("out");
             }
@@ -94,21 +97,24 @@ module.exports = function(passport,databaseConnection) {
                     var result = usermodule.createuser(email,password);
                     if(result === true )
                     {
+                        req.flash("successmessage", "You have sign up successfully ");
                         //console.log('usercraeted');
                         user["email"]=email;
                         user["status"]=true;
-                        user["name"]="John Snow";
+                        user["name"]=email;
                         user["avatar"]="";
                         user["loginStatus"]=true;
+                        return done(null, user);
 
                     }else{
-
-                        console.log('error ');
+                        req.flash("errormessage", "sign up ptocess failed");
+                        //console.log('error ');
                     }
                 }else{
-                    console.log("out");
+                    req.flash("errormessage", "Invalide email!");
+                    //console.log("out");
                 }
-                return done(null, user);
+                return done(null,false, user);
 
             });
 
@@ -167,7 +173,7 @@ module.exports = function(passport,databaseConnection) {
                 var user={};
 
 
-                var result = usermodule.fblogin(profile.emails[0].value,profile.id);
+                var result = usermodule.fblogin(profile.emails[0].value,profile.id,profile.name.givenName);
 
 
                 user["id"]=profile.id;
@@ -177,6 +183,7 @@ module.exports = function(passport,databaseConnection) {
                 user["name"]=profile.name.givenName + ' ' + profile.name.familyName;;
                 user["avatar"]="";
                 user["loginStatus"]=true;
+                //req.flash("successmessage", "Welcome "+user["name"]);
                 return done(null, user);
             });
 
