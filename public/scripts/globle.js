@@ -189,6 +189,8 @@ function toggleMapPlanPanle() {
     if(typeof pos !== 'undefined'){
         $( ".map-plan-panel" ). toggleClass( "hidden" );
         $( ".map-city-panel" ). toggleClass( "hidden" );
+        $( ".map-plan-panel-pp" ). toggleClass( "toggled-poi" );
+        $( ".make-route" ). toggleClass( "hidden" );
         //alert("not empty");
     }else{
         //alert("empty");
