@@ -9,6 +9,6 @@ User can also find other travelar that are in the same city and have a chat with
 - Then under this project directory run this commend on node js "npm install"
 - Then run the file in bin/www
 
-The project is done by:
+# The project is done by:
 Shahab Shakoor , Areeb Ahmed , Mir Zafarullah Khan , Muhammad Shoaib , Syed Daniyal Asif
 Fachbereich Informatik und Elektrotechnik, Fachhochschule Kiel, Germany
